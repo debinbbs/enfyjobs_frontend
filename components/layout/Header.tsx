@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/ui/logo";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -52,9 +52,7 @@ export function Header() {
           />
         </div>
         <ThemeToggle />
-        <Button className="rounded-full signature-gradient text-on-primary font-bold ambient-glow hover:opacity-90 transition-opacity px-6 h-10 shadow-lg border-none">
-          Get Started
-        </Button>
+        <AuthModal />
       </div>
     </header>
   );

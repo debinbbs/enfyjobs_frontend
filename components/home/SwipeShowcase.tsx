@@ -17,7 +17,7 @@ export function SwipeShowcase() {
             <CardContent className="p-0">
               <div className="mb-6 flex items-center gap-4">
                 <Avatar className="size-12 shadow-inner border border-border/50 bg-muted p-1">
-                  <AvatarImage src="/images/home/cultfit-logo.png" className="object-contain" />
+                  <AvatarImage src="/images/home/showcase/cultfit-logo.png" className="object-contain" />
                   <AvatarFallback>CF</AvatarFallback>
                 </Avatar>
                 <div>
@@ -27,7 +27,7 @@ export function SwipeShowcase() {
               </div>
               <div className="aspect-square rounded-3xl mb-8 overflow-hidden shadow-xl relative border border-border/20">
                 <Image 
-                  src="/images/home/fitness-class.jpg"
+                  src="/images/home/showcase/fitness-class.jpg"
                   alt="Fitness Class"
                   fill
                   className="object-cover"

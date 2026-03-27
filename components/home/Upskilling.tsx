@@ -37,7 +37,7 @@ export function Upskilling() {
           <div className="flex-1 grid grid-cols-2 gap-6 w-full lg:w-auto">
             <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-muted relative shadow-2xl border border-white/10">
               <Image 
-                src="/images/home/wellness-student.jpg"
+                src="/images/home/upskilling/wellness-student.jpg"
                 alt="Wellness Student"
                 fill
                 className="object-cover"
@@ -45,7 +45,7 @@ export function Upskilling() {
             </div>
             <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-muted relative mt-16 shadow-2xl border border-white/10">
               <Image 
-                src="/images/home/professionals.jpg"
+                src="/images/home/upskilling/professionals.jpg"
                 alt="Professionals"
                 fill
                 className="object-cover"
