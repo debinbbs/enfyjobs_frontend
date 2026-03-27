@@ -10,7 +10,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 
 export default function Home() {
   return (
-    <main className="flex-1 max-w-7xl mx-auto px-6 md:px-10 pt-32">
+    <main className="flex-1 max-w-7xl mx-auto px-6 md:px-10 pt-24">
       <Hero />
       <Features />
       <Categories />

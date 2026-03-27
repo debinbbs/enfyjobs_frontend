@@ -209,6 +209,14 @@ h1, h2, h3, h4, h5, h6 {
   @apply absolute blur-[60px] -z-10 opacity-40;
 }
 
+.prana-glow {
+  box-shadow: 0 20px 40px rgba(106, 55, 212, 0.15);
+}
+
+.kinetic-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+}
+
 .dark {
   --background: #020617;
   --foreground: #f6f6ff;

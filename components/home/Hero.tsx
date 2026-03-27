@@ -61,7 +61,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative py-12 md:py-24 overflow-visible">
+    <section className="relative py-12 md:py-16 overflow-visible">
       <div className="kinetic-blob w-96 h-96 bg-primary-container -top-20 -left-20"></div>
       <div className="kinetic-blob w-80 h-80 bg-secondary-container bottom-0 -right-10"></div>
       
