@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   description: "AI resumes, swipe jobs, and crack interviews — all in one sanctuary designed for the next generation of wellness professionals.",
 };
 
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { ThemeProvider } from "@/components/theme-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,6 +34,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn("h-full", "antialiased", plusJakartaSans.variable, beVietnamPro.variable, "font-sans", geist.variable)}
+      suppressHydrationWarning
     >
       <head>
         <link
@@ -37,7 +42,18 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className={cn("min-h-full flex flex-col bg-background selection:bg-primary/20", "antialiased")}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          {children}
+          <Footer />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

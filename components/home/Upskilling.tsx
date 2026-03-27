@@ -1,0 +1,59 @@
+"use client";
+
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { BadgeCheck, TrendingUp, History, Users } from "lucide-react";
+
+export function Upskilling() {
+  const benefits = [
+    { icon: <BadgeCheck className="size-7" />, text: "Verified Certificates" },
+    { icon: <TrendingUp className="size-7" />, text: "Skill Growth Modules" },
+    { icon: <History className="size-7" />, text: "Placement Support" },
+    { icon: <Users className="size-7" />, text: "Community Access" }
+  ];
+
+  return (
+    <section className="py-24">
+      <div className="bg-surface-container-low rounded-[4rem] p-10 md:p-20 relative overflow-hidden shadow-2xl border border-outline-variant/10">
+        <div className="kinetic-blob w-[500px] h-[500px] bg-primary/10 top-0 right-0 blur-[120px]"></div>
+        <div className="relative z-10 flex flex-col lg:flex-row gap-20 items-center">
+          <div className="flex-1 space-y-10">
+            <h2 className="text-foreground text-5xl md:text-6xl font-black font-display leading-tight">Not ready yet? <br/>We&apos;ve got you 💪</h2>
+            <p className="text-muted-foreground text-xl leading-relaxed max-w-xl">
+              Bridge the skill gap with our curated certification programs and development courses designed by industry veterans.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+              {benefits.map((item, i) => (
+                <div key={i} className="flex items-center gap-4 text-foreground">
+                  <div className="text-primary">{item.icon}</div>
+                  <span className="font-bold">{item.text}</span>
+                </div>
+              ))}
+            </div>
+            <Button size="lg" className="h-16 px-12 rounded-full signature-gradient text-on-primary font-black text-xl shadow-2xl hover:scale-105 transition-transform border-none">
+              Start Learning 🚀
+            </Button>
+          </div>
+          <div className="flex-1 grid grid-cols-2 gap-6 w-full lg:w-auto">
+            <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-muted relative shadow-2xl border border-white/10">
+              <Image 
+                src="/images/home/wellness-student.jpg"
+                alt="Wellness Student"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-muted relative mt-16 shadow-2xl border border-white/10">
+              <Image 
+                src="/images/home/professionals.jpg"
+                alt="Professionals"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
