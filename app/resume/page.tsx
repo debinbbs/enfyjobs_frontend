@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Phase01Foundation } from "@/components/resume/Phase01Foundation";
 import { Phase02Journey } from "@/components/resume/Phase02Journey";
+import { Phase03VibeCheck } from "@/components/resume/Phase03VibeCheck";
+import { Phase04Manifested } from "@/components/resume/Phase04Manifested";
 import { StepIndicator } from "@/components/resume/StepIndicator";
 import { ResumePreview } from "@/components/resume/ResumePreview";
 import { TopSpace } from "@/components/utils/TopSpace";
@@ -21,6 +23,8 @@ export default function ResumePage() {
   const [discipline, setDiscipline] = useState("yoga");
   const [selectedEnergies, setSelectedEnergies] = useState<string[]>(["EMPATHETIC"]);
   const [modalities, setModalities] = useState<string[]>(["Hatha Yoga", "Meditation", "Ayurveda"]);
+  const [highEnergy, setHighEnergy] = useState(false);
+  const [profZen, setProfZen] = useState(false);
   const [journey, setJourney] = useState([
     {
       role: "Senior Wellness Director",
@@ -77,8 +81,24 @@ export default function ResumePage() {
                 setJourney={setJourney}
                 modalities={modalities}
                 setModalities={setModalities}
-                onNext={() => console.log("Final State:", { discipline, selectedEnergies, journey, modalities })}
+                onNext={() => setCurrentStep(3)}
                 onBack={() => setCurrentStep(1)}
+              />
+            )}
+            {currentStep === 3 && (
+              <Phase03VibeCheck 
+                highEnergy={highEnergy}
+                setHighEnergy={setHighEnergy}
+                profZen={profZen}
+                setProfZen={setProfZen}
+                onNext={() => setCurrentStep(4)}
+                onBack={() => setCurrentStep(2)}
+              />
+            )}
+            {currentStep === 4 && (
+              <Phase04Manifested 
+                onBack={() => setCurrentStep(3)}
+                onExploreMatches={() => window.location.href = "/dashboard"}
               />
             )}
           </div>
@@ -95,6 +115,8 @@ export default function ResumePage() {
               vibe={["Vinyasa", "Bio-hacking", "Mindfulness"]}
               journey={journey}
               modalities={modalities}
+              highEnergy={highEnergy}
+              profZen={profZen}
             />
           </div>
         </div>

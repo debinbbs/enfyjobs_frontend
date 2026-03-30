@@ -36,8 +36,8 @@ export function Phase01Foundation({
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-left-8 duration-700">
       <div className="space-y-6">
-        <h1 className="text-5xl font-black tracking-tight leading-[1.1] text-on-surface">
-          Define your <span className="bg-gradient-to-r from-[#6a37d4] to-[#00675d] bg-clip-text text-transparent italic">professional aura.</span>
+        <h1 className="text-5xl font-black tracking-tight leading-normal text-on-surface">
+          Define your <span className="inline-block bg-gradient-to-r from-[#6a37d4] to-[#00675d] bg-clip-text text-transparent italic pr-10 -mr-10">professional aura.</span>
         </h1>
         <p className="text-lg text-on-surface-variant leading-relaxed max-w-md">
           Let's set the foundation. Your discipline and energies shape how recruiters perceive your wellness practice.
