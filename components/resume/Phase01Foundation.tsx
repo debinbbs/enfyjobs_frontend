@@ -47,7 +47,7 @@ const disciplines = [
     description: "Restoration, circadian rhythm optimization, and breathwork. 🌬️",
     icon: "dark_mode",
     color: "bg-primary-fixed text-on-primary-fixed",
-    image: "/images/resume/meditation.webp",
+    image: "/images/resume/sleep_and_breath.png",
     className: "md:col-span-2 bg-surface-container-low",
   },
 ];

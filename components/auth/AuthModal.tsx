@@ -5,7 +5,9 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Smartphone, Verified } from "lucide-react";
+import { Sparkles, Verified } from "lucide-react";
+import { CountryCodeSelector } from "./CountryCodeSelector";
+import { countries, Country } from "@/lib/countries";
 
 interface AuthModalProps {
   children?: React.ReactElement;
@@ -42,6 +44,9 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 
 export function AuthModal({ children }: AuthModalProps) {
   const [open, setOpen] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    countries.find((c) => c.code === "IN") || countries[0]
+  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -130,12 +135,15 @@ export function AuthModal({ children }: AuthModalProps) {
                 <div className="space-y-6">
                   <div className="space-y-2 px-1">
                     <label className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant ml-4 block">Mobile Phone</label>
-                    <div className="relative group">
-                      <Smartphone className="absolute left-6 top-1/2 -translate-y-1/2 size-5 text-outline group-focus-within:text-primary transition-colors" />
+                    <div className="flex h-16 bg-surface-container-highest rounded-full focus-within:ring-2 focus-within:ring-primary/20 focus-within:bg-surface-container-lowest transition-all group relative">
+                      <CountryCodeSelector
+                        selectedCountry={selectedCountry}
+                        onSelect={setSelectedCountry}
+                      />
                       <Input
-                        placeholder="+91 00000 00000"
+                        placeholder="00000 00000"
                         type="tel"
-                        className="h-16 pl-16 pr-6 bg-surface-container-highest border-none rounded-full focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:bg-surface-container-lowest transition-all placeholder:text-outline/40 font-black text-lg"
+                        className="flex-1 h-full px-6 bg-transparent border-none rounded-r-full focus-visible:ring-0 focus-visible:bg-transparent transition-none placeholder:text-outline/40 font-black text-lg"
                       />
                     </div>
                   </div>
