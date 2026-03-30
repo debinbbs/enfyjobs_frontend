@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { Moon, Sun, Monitor, Check } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
 import {
@@ -16,9 +17,9 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   const themes = [
-    { name: "light", label: "Light Mode", icon: Sun },
-    { name: "dark", label: "Dark Mode", icon: Moon },
-    { name: "system", label: "System", icon: Monitor },
+    { name: "light" as const, label: "Light Mode", icon: Sun },
+    { name: "dark" as const, label: "Dark Mode", icon: Moon },
+    { name: "system" as const, label: "System", icon: Monitor },
   ];
 
   return (

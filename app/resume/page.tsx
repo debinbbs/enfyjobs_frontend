@@ -16,29 +16,122 @@ const steps = [
   { id: 4, label: "Manifested" },
 ];
 
+interface JourneyItem {
+  role: string;
+  company: string;
+  duration: string;
+  description: string;
+}
+
+interface CertificationItem {
+  title: string;
+  link?: string;
+}
+
+interface EducationItem {
+  school: string;
+  degree: string;
+  year: string;
+}
+
+interface AchievementItem {
+  name: string;
+  duration?: string;
+  description: string;
+  link?: string;
+}
+
+interface LanguageItem {
+  language: string;
+  level: string;
+}
+
+interface SocialLinks {
+  linkedin?: string;
+  portfolio?: string;
+  instagram?: string;
+  youtube?: string;
+  twitter?: string;
+}
+
+interface ReferenceItem {
+  name: string;
+  role: string;
+  company: string;
+  phone: string;
+}
+
 export default function ResumePage() {
   const [currentStep, setCurrentStep] = useState(1);
-  
-  // Shared State
-  const [discipline, setDiscipline] = useState("yoga");
-  const [selectedEnergies, setSelectedEnergies] = useState<string[]>(["EMPATHETIC"]);
-  const [modalities, setModalities] = useState<string[]>(["Hatha Yoga", "Meditation", "Ayurveda"]);
-  const [highEnergy, setHighEnergy] = useState(false);
-  const [profZen, setProfZen] = useState(false);
-  const [journey, setJourney] = useState([
+
+  // Resume State - Personal Info
+  const [fullName, setFullName] = useState("Arya Sharma");
+  const [email, setEmail] = useState("arya.sharma@wellness.com");
+  const [phone, setPhone] = useState("+91 98765 43210");
+  const [location, setLocation] = useState("Mumbai, India");
+  const [experienceLevel, setExperienceLevel] = useState("Fresher");
+  const [preferredRole, setPreferredRole] = useState("Front Desk Executive");
+  const [personalSummary, setPersonalSummary] = useState("Friendly and well-presented hospitality professional with hands-on experience in front desk operations, guest handling, and F&B service. Passionate about creating memorable guest experiences and maintaining high professional standards in fast-paced hotel and restaurant environments.");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  // Resume State - Content
+  const [discipline, setDiscipline] = useState("");
+  const [selectedEnergies, setSelectedEnergies] = useState<string[]>([]);
+  const [journey, setJourney] = useState<JourneyItem[]>([
     {
-      role: "Senior Wellness Director",
-      company: "ZenFlow Studios",
-      duration: "2021 — PRESENT",
-      description: "Scaled the mindfulness program by 40% across 12 urban retreats. Engineered a hybrid sound-healing curriculum."
-    },
-    {
-      role: "Yoga Lead & Instructor",
-      company: "Himalayan Retreats",
-      duration: "2018 — 2021",
-      description: "Curated 500+ hours of advanced Hatha and Vinyasa workshops for international practitioners."
+      role: "Front Desk Associate",
+      company: "The Leela Palace, Mumbai",
+      duration: "2023-06-01 - Present",
+      description: "Managed guest check-in and check-out for a 5-star property handling over 200 guests daily. Coordinated room assignments, resolved guest complaints, and maintained front desk records. Consistently received 4.8/5 guest satisfaction scores."
     }
   ]);
+  const [internships, setInternships] = useState<JourneyItem[]>([
+    {
+      role: "F&B Service Trainee",
+      company: "Marriott International, Pune",
+      duration: "2022-11-01 - 2023-05-30",
+      description: "Assisted restaurant staff in table setup, order taking, and food service for banquet events with 300+ guests. Trained in fine dining etiquette and POS billing systems."
+    }
+  ]);
+  const [achievements, setAchievements] = useState<AchievementItem[]>([
+    {
+      name: "Best Intern of the Month — Marriott Pune",
+      duration: "February 2023",
+      description: "Recognised for exceptional guest handling skills and punctuality across all scheduled shifts during a 6-month internship programme."
+    }
+  ]);
+  const [education, setEducation] = useState<EducationItem[]>([
+    {
+      school: "St. Xavier's College",
+      degree: "B.A. in Hospitality Management",
+      year: "2024"
+    }
+  ]);
+  const [awards, setAwards] = useState<string[]>(["Employee of the Month — The Leela Palace (August 2023)"]);
+  const [certifications, setCertifications] = useState<CertificationItem[]>([
+    { title: "FSSAI Food Handler Certificate" },
+    { title: "First Aid & CPR Certified" }
+  ]);
+
+  const [languages, setLanguages] = useState<LanguageItem[]>([
+    { language: "English", level: "Fluent" },
+    { language: "Hindi", level: "Native" }
+  ]);
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>({
+    linkedin: "linkedin.com/in/arya-sharma",
+    portfolio: ""
+  });
+  const [skills, setSkills] = useState<string[]>(["Customer Service", "Teamwork", "Guest Relations"]);
+  const [softSkills, setSoftSkills] = useState<string[]>(["Punctual", "Well-Groomed", "Friendly"]);
+  const [hobbies, setHobbies] = useState<string[]>(["Cooking", "Yoga", "Travelling"]);
+  const [availability, setAvailability] = useState<string>("Full-time");
+  const [shiftPreference, setShiftPreference] = useState<string[]>(["Day Shift"]);
+  const [references, setReferences] = useState<ReferenceItem[]>([
+    { name: "Rajan Mehta", role: "Front Office Manager", company: "The Leela Palace, Mumbai", phone: "+91 98200 12345" }
+  ]);
+
+  const [highEnergy, setHighEnergy] = useState(false);
+  const [profZen, setProfZen] = useState(false);
 
   const toggleEnergy = (energy: string) => {
     setSelectedEnergies((prev) =>
@@ -77,10 +170,50 @@ export default function ResumePage() {
             )}
             {currentStep === 2 && (
               <Phase02Journey 
+                fullName={fullName}
+                setFullName={setFullName}
+                email={email}
+                setEmail={setEmail}
+                phone={phone}
+                setPhone={setPhone}
+                location={location}
+                setLocation={setLocation}
+                experienceLevel={experienceLevel}
+                setExperienceLevel={setExperienceLevel}
+                preferredRole={preferredRole}
+                setPreferredRole={setPreferredRole}
+                personalSummary={personalSummary}
+                setPersonalSummary={setPersonalSummary}
+                profileImage={profileImage}
+                setProfileImage={setProfileImage}
                 journey={journey}
                 setJourney={setJourney}
-                modalities={modalities}
-                setModalities={setModalities}
+                internships={internships}
+                setInternships={setInternships}
+                achievements={achievements}
+                setAchievements={setAchievements}
+                education={education}
+                setEducation={setEducation}
+                awards={awards}
+                setAwards={setAwards}
+                certifications={certifications}
+                setCertifications={setCertifications}
+                languages={languages}
+                setLanguages={setLanguages}
+                socialLinks={socialLinks}
+                setSocialLinks={setSocialLinks}
+                skills={skills}
+                setSkills={setSkills}
+                softSkills={softSkills}
+                setSoftSkills={setSoftSkills}
+                hobbies={hobbies}
+                setHobbies={setHobbies}
+                availability={availability}
+                setAvailability={setAvailability}
+                shiftPreference={shiftPreference}
+                setShiftPreference={setShiftPreference}
+                references={references}
+                setReferences={setReferences}
                 onNext={() => setCurrentStep(3)}
                 onBack={() => setCurrentStep(1)}
               />
@@ -106,15 +239,29 @@ export default function ResumePage() {
           {/* Right Column: Reusable Live Preview */}
           <div className="lg:col-span-7">
             <ResumePreview 
-              name="Arya Sharma"
-              title={discipline === "yoga" ? "Lead Yoga Strategist" : "Wellness Professional"}
-              location="Rishikesh, IN"
-              email="arya@vibemail.com"
-              phone="+91 98765 43210"
+              name={fullName}
+              title={preferredRole}
+              location={location}
+              email={email}
+              phone={phone}
+              personalSummary={personalSummary}
+              profileImage={profileImage || undefined}
               aura={getAuraFromEnergies()}
-              vibe={["Vinyasa", "Bio-hacking", "Mindfulness"]}
+              vibe={skills}
               journey={journey}
-              modalities={modalities}
+              internships={internships}
+              achievements={achievements}
+              education={education}
+              awards={awards}
+              certifications={certifications}
+              languages={languages}
+              socialLinks={socialLinks}
+              modalities={skills}
+              softSkills={softSkills}
+              hobbies={hobbies}
+              availability={availability}
+              shiftPreference={shiftPreference}
+              references={references}
               highEnergy={highEnergy}
               profZen={profZen}
             />
