@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -9,6 +10,7 @@ import { AuthModal } from "@/components/auth/AuthModal";
 import Link from "next/link";
 
 export function Header() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
