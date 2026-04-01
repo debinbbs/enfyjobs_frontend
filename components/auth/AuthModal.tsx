@@ -1,16 +1,59 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Verified } from "lucide-react";
+import { LoaderCircle, Sparkles, Verified } from "lucide-react";
 import { CountryCodeSelector } from "./CountryCodeSelector";
 import { countries, Country } from "@/lib/countries";
 
 interface AuthModalProps {
   children?: React.ReactElement;
+}
+
+type CandidateStep = "phone" | "otp" | "success";
+type CandidateAction = "send" | "verify" | null;
+
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001").replace(/\/$/, "");
+const CANDIDATE_SESSION_STORAGE_KEY = "enfyjobs:candidate-session";
+
+function getApiErrorMessage(payload: unknown, fallbackMessage: string) {
+  if (!payload || typeof payload !== "object") {
+    return fallbackMessage;
+  }
+
+  const message = (payload as { message?: string | string[] }).message;
+  if (Array.isArray(message)) {
+    return message.join(", ");
+  }
+
+  return typeof message === "string" ? message : fallbackMessage;
+}
+
+function normalizeCandidatePhone(country: Country, rawPhoneNumber: string) {
+  const digits = rawPhoneNumber.replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  const dialDigits = country.dial_code.replace(/\D/g, "");
+  const localNumber = digits.startsWith(dialDigits) ? digits.slice(dialDigits.length) : digits;
+
+  return `+${dialDigits}${localNumber}`;
+}
+
+function formatPhoneInput(rawPhoneNumber: string) {
+  const digits = rawPhoneNumber.replace(/\D/g, "").slice(0, 10);
+
+  if (digits.length <= 5) {
+    return digits;
+  }
+
+  return `${digits.slice(0, 5)} ${digits.slice(5)}`.trim();
 }
 
 // Custom Brand Icons since they are missing in this lucide-react version
@@ -43,13 +86,137 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 );
 
 export function AuthModal({ children }: AuthModalProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country>(
     countries.find((c) => c.code === "IN") || countries[0]
   );
+  const [candidatePhone, setCandidatePhone] = useState("");
+  const [candidateOtp, setCandidateOtp] = useState("");
+  const [candidateStep, setCandidateStep] = useState<CandidateStep>("phone");
+  const [candidateAction, setCandidateAction] = useState<CandidateAction>(null);
+  const [candidateError, setCandidateError] = useState("");
+  const [candidateMessage, setCandidateMessage] = useState("");
+
+  const resetCandidateState = () => {
+    setCandidatePhone("");
+    setCandidateOtp("");
+    setCandidateStep("phone");
+    setCandidateAction(null);
+    setCandidateError("");
+    setCandidateMessage("");
+  };
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+
+    if (!nextOpen) {
+      resetCandidateState();
+    }
+  };
+
+  const candidatePhoneNumber = normalizeCandidatePhone(selectedCountry, candidatePhone);
+  const isSendingOtp = candidateAction === "send";
+  const isVerifyingOtp = candidateAction === "verify";
+
+  const handleSendOtp = async () => {
+    if (selectedCountry.code !== "IN") {
+      setCandidateError("Candidate mobile login is available for Indian numbers right now.");
+      return;
+    }
+
+    if (candidatePhone.replace(/\D/g, "").length !== 10) {
+      setCandidateError("Enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    setCandidateAction("send");
+    setCandidateError("");
+    setCandidateMessage("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/verification/send-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phoneNumber: candidatePhoneNumber,
+        }),
+      });
+
+      const payload = (await response.json().catch(() => null)) as unknown;
+      if (!response.ok) {
+        throw new Error(getApiErrorMessage(payload, "Failed to send OTP."));
+      }
+
+      setCandidateStep("otp");
+      setCandidateOtp("");
+      setCandidateMessage(`OTP sent to ${candidatePhoneNumber}.`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to send OTP.";
+      setCandidateError(message);
+    } finally {
+      setCandidateAction(null);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (candidateOtp.length !== 6) {
+      setCandidateError("Enter the 6-digit OTP.");
+      return;
+    }
+
+    setCandidateAction("verify");
+    setCandidateError("");
+    setCandidateMessage("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/candidate/mobile-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phoneNumber: candidatePhoneNumber,
+          code: candidateOtp,
+        }),
+      });
+
+      const payload = (await response.json().catch(() => null)) as unknown;
+      if (!response.ok) {
+        throw new Error(getApiErrorMessage(payload, "Failed to verify OTP."));
+      }
+
+      window.localStorage.setItem(
+        CANDIDATE_SESSION_STORAGE_KEY,
+        JSON.stringify({
+          ...(payload as object),
+          phoneNumber: candidatePhoneNumber,
+          loginAt: new Date().toISOString(),
+        })
+      );
+
+      window.dispatchEvent(
+        new CustomEvent("enfyjobs:candidate-authenticated", {
+          detail: payload,
+        })
+      );
+
+      setCandidateStep("success");
+      setCandidateMessage("Taking you to your candidate dashboard...");
+      handleOpenChange(false);
+      router.push("/dashboard/candidate");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to verify OTP.";
+      setCandidateError(message);
+    } finally {
+      setCandidateAction(null);
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
           children || (
@@ -141,16 +308,86 @@ export function AuthModal({ children }: AuthModalProps) {
                         onSelect={setSelectedCountry}
                       />
                       <Input
-                        placeholder="00000 00000"
+                        placeholder="98765 43210"
                         type="tel"
+                        inputMode="numeric"
+                        value={formatPhoneInput(candidatePhone)}
+                        onChange={(event) => {
+                          setCandidatePhone(event.target.value.replace(/\D/g, "").slice(0, 10));
+                        }}
                         className="flex-1 h-full px-6 bg-transparent border-none rounded-r-full focus-visible:ring-0 focus-visible:bg-transparent transition-none placeholder:text-outline/40 font-black text-lg"
                       />
                     </div>
                   </div>
 
-                  <Button className="w-full h-16 signature-gradient text-on-primary rounded-full font-black text-xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all border-none">
-                    Get Magic Link ⚡
-                  </Button>
+                  {candidateStep !== "phone" && (
+                    <div className="space-y-2 px-1">
+                      <label className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant ml-4 block">OTP Code</label>
+                      <Input
+                        placeholder="123456"
+                        type="text"
+                        inputMode="numeric"
+                        value={candidateOtp}
+                        onChange={(event) => {
+                          setCandidateOtp(event.target.value.replace(/\D/g, "").slice(0, 6));
+                        }}
+                        className="h-16 px-8 bg-surface-container-highest border-none rounded-full focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:bg-surface-container-lowest transition-all placeholder:text-outline/40 font-black text-lg tracking-[0.4em] text-center"
+                      />
+                    </div>
+                  )}
+
+                  {candidateError && (
+                    <p className="px-4 text-sm font-bold text-red-500">{candidateError}</p>
+                  )}
+
+                  {candidateMessage && (
+                    <p className="px-4 text-sm font-bold text-emerald-600">{candidateMessage}</p>
+                  )}
+
+                  {candidateStep === "phone" ? (
+                    <Button
+                      onClick={handleSendOtp}
+                      disabled={isSendingOtp}
+                      className="w-full h-16 signature-gradient text-on-primary rounded-full font-black text-xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all border-none disabled:hover:scale-100"
+                    >
+                      {isSendingOtp ? (
+                        <span className="inline-flex items-center gap-2">
+                          <LoaderCircle className="size-5 animate-spin" />
+                          Sending OTP
+                        </span>
+                      ) : (
+                        "Send OTP"
+                      )}
+                    </Button>
+                  ) : (
+                    <div className="space-y-3">
+                      <Button
+                        onClick={handleVerifyOtp}
+                        disabled={isVerifyingOtp || candidateStep === "success"}
+                        className="w-full h-16 signature-gradient text-on-primary rounded-full font-black text-xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all border-none disabled:hover:scale-100"
+                      >
+                        {isVerifyingOtp ? (
+                          <span className="inline-flex items-center gap-2">
+                            <LoaderCircle className="size-5 animate-spin" />
+                            Verifying
+                          </span>
+                        ) : candidateStep === "success" ? (
+                          "Signed In"
+                        ) : (
+                          "Verify & Continue"
+                        )}
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        onClick={handleSendOtp}
+                        disabled={isSendingOtp || isVerifyingOtp}
+                        className="w-full h-12 rounded-full border-outline-variant/20"
+                      >
+                        Resend OTP
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <p className="text-center text-[10px] text-outline font-black uppercase tracking-[0.1em] px-8 leading-relaxed opacity-60">
