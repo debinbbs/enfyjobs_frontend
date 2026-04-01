@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, X, Heart } from "lucide-react";
+import { ArrowRight, FileText, Heart, Sparkles, Target, X } from "lucide-react";
 import { useState } from "react";
 import { Swapper } from "@/components/ui/Swapper";
 import type { Swiper as SwiperType } from 'swiper';
@@ -51,6 +52,23 @@ const JOBS = [
 
 export function Hero() {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
+  const proofPoints = [
+    {
+      icon: <Heart className="size-4 text-primary fill-current" />,
+      label: "Swipe",
+      detail: "Discover roles fast and save the ones that feel right.",
+    },
+    {
+      icon: <FileText className="size-4 text-secondary" />,
+      label: "Resume",
+      detail: "Build a cleaner profile with tools made for wellness talent.",
+    },
+    {
+      icon: <Target className="size-4 text-tertiary" />,
+      label: "Prepare",
+      detail: "Practice, apply, and walk into interviews with more confidence.",
+    },
+  ];
 
   const handleNext = () => {
     if (swiper) swiper.slideNext();
@@ -67,21 +85,44 @@ export function Hero() {
       
       <div className="flex flex-col lg:flex-row gap-16 items-center">
         <div className="flex-1 space-y-8 z-10">
+          <Badge className="w-fit rounded-full bg-secondary/10 text-secondary border border-secondary/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em]">
+            Built for wellness candidates
+          </Badge>
           <h1 className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight font-display text-foreground">
-            Build Your Wellness Career — <span className="text-primary">Smarter, Faster, Better 🌿</span>
+            Find wellness roles that actually fit your energy, skills, and city.
           </h1>
-          <p className="text-muted-foreground text-lg md:text-xl max-w-lg leading-relaxed">
-            AI resumes, swipe jobs, and crack interviews — all in one sanctuary designed for the next generation of wellness professionals.
+          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl leading-relaxed">
+            Wellnessjobsindia helps wellness professionals discover opportunities, build stronger applications, and move through the hiring journey with less confusion. Swipe roles, sharpen your resume, and get ready for the next step.
           </p>
           <div className="flex flex-wrap gap-4">
+            <Link
+              href="/jobs"
+              className="inline-flex h-14 items-center gap-2 rounded-full signature-gradient px-8 text-lg font-black text-on-primary shadow-xl transition-transform hover:scale-105"
+            >
+              Explore Roles
+              <ArrowRight className="size-5" />
+            </Link>
             <AuthModal>
-              <Button size="lg" className="rounded-full signature-gradient text-on-primary font-black text-lg shadow-xl hover:scale-105 transition-transform px-10 h-14 border-none">
+              <Button size="lg" variant="outline" className="rounded-full bg-card text-foreground font-black text-lg border-2 border-border/50 hover:bg-muted transition-all px-8 h-14">
                 Get Started
               </Button>
             </AuthModal>
-            <Button size="lg" variant="outline" className="rounded-full bg-card text-foreground font-black text-lg border-2 border-border/50 hover:bg-muted transition-all px-10 h-14">
-              Try Resume AI ⚡
-            </Button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl">
+            {proofPoints.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-[1.5rem] border border-border/30 bg-card/80 px-5 py-4 shadow-lg"
+              >
+                <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-foreground">
+                  {item.icon}
+                  {item.label}
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {item.detail}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -124,6 +165,11 @@ export function Hero() {
                     <div className="absolute top-6 right-6 bg-white/10 backdrop-blur-xl border border-white/20 px-4 py-2 rounded-full shadow-2xl flex items-center gap-2">
                       <Sparkles className="size-3 text-secondary" />
                       <span className="text-white font-black text-[10px] uppercase tracking-widest">{job.match}% Match</span>
+                    </div>
+
+                    <div className="absolute top-6 left-6 bg-black/30 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full shadow-2xl flex items-center gap-2">
+                      <Heart className="size-3 text-white fill-current" />
+                      <span className="text-white font-black text-[10px] uppercase tracking-widest">Swipe to shortlist</span>
                     </div>
                   </div>
 

@@ -12,6 +12,7 @@ import Link from "next/link";
 export function Header() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
+  const showSearch = pathname === "/jobs";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,13 +42,13 @@ export function Header() {
         </Link>
         <nav className="hidden lg:flex items-center gap-8">
           <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/jobs">Jobs</Link>
-          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/auth/resume">AI Resume</Link>
-          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/auth/interview">Interview Prep</Link>
-          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/auth/upskill">Upskill</Link>
+          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/#categories">Categories</Link>
+          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/#journey">How It Works</Link>
+          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/#growth">Growth</Link>
         </nav>
       </div>
       <div className="flex items-center gap-6">
-        <div className="hidden md:flex items-center relative group">
+        <div className={`${showSearch ? "hidden md:flex" : "hidden"} items-center relative group`}>
           <Search className="absolute left-4 text-outline group-focus-within:text-primary transition-colors size-4" />
           <Input
             className="bg-surface-container-high rounded-full py-2.5 pl-11 pr-6 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all border-none ring-offset-background"

@@ -11,13 +11,13 @@ export function Testimonials() {
       name: "Priya Sharma",
       role: "Yoga Trainer, Mumbai",
       img: "/images/home/priya-sharma.jpg",
-      quote: "The AI Resume builder is a game-changer. I got 3 interviews within a week of signing up!"
+      quote: "The resume builder helped me present my certifications and experience much better. I started getting serious callbacks instead of silence."
     },
     {
       name: "Arjun Verma",
       role: "Fitness Coach, Delhi",
       img: "/images/home/arjun-verma.jpg",
-      quote: "Finally a job board that doesn't feel like 2005. The swiping experience is addictive and efficient."
+      quote: "The swiping flow is quick, but what I liked most was that the jobs actually felt relevant to my background and goals."
     }
   ];
 
@@ -25,18 +25,18 @@ export function Testimonials() {
     <section className="py-24">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 items-center">
         <div className="lg:col-span-1 space-y-10 text-foreground">
-          <h2 className="text-5xl font-black font-display leading-[1.05]">Young India&apos;s Wellness Voice</h2>
+          <h2 className="text-5xl font-black font-display leading-[1.05]">Built for the next wave of wellness talent</h2>
           <p className="text-xl text-muted-foreground leading-relaxed">
-            Join 50,000+ professionals who found their dream careers through our platform.
+            From first jobs to stronger career moves, Wellnessjobsindia is designed to help wellness candidates feel more seen, more prepared, and more in control.
           </p>
           <div className="flex gap-12">
             <div>
               <span className="text-5xl font-black text-primary">50k+</span>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-3">Active Users</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-3">Candidates Exploring</p>
             </div>
             <div>
               <span className="text-5xl font-black text-secondary">1.2k+</span>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-3">Hired Locally</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-3">Career Moves Started</p>
             </div>
           </div>
         </div>

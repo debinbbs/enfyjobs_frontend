@@ -1,19 +1,22 @@
 "use client";
 
-import { FileText, BadgeCheck, MousePointerClick, SlidersHorizontal, PartyPopper } from "lucide-react";
+import { BadgeCheck, FileText, MousePointerClick, PartyPopper, SlidersHorizontal } from "lucide-react";
 
 export function HiringJourney() {
   const steps = [
-    { icon: <FileText className="size-9" />, title: "1. Build Resume", subtitle: "AI-Optimized", color: "text-primary border-primary/20" },
-    { icon: <BadgeCheck className="size-9" />, title: "2. Learn Skills", subtitle: "Certifications", color: "text-secondary border-secondary/20" },
-    { icon: <MousePointerClick className="size-9" />, title: "3. Swipe & Apply", subtitle: "Instant Match", color: "text-tertiary border-tertiary/20" },
-    { icon: <SlidersHorizontal className="size-9" />, title: "4. Interview Prep", subtitle: "AI Feedback", color: "text-primary border-primary/20" },
-    { icon: <PartyPopper className="size-9" />, title: "5. Get Hired 🎉", subtitle: "Career Start", color: "text-on-secondary bg-secondary scale-125 shadow-2xl border-none" }
+    { icon: <FileText className="size-9" />, title: "1. Build your profile", subtitle: "Resume + basics", color: "text-primary border-primary/20" },
+    { icon: <BadgeCheck className="size-9" />, title: "2. Show your strengths", subtitle: "Skills + certifications", color: "text-secondary border-secondary/20" },
+    { icon: <MousePointerClick className="size-9" />, title: "3. Swipe and apply", subtitle: "Discover better-fit roles", color: "text-tertiary border-tertiary/20" },
+    { icon: <SlidersHorizontal className="size-9" />, title: "4. Prepare with confidence", subtitle: "Interview practice", color: "text-primary border-primary/20" },
+    { icon: <PartyPopper className="size-9" />, title: "5. Start your next chapter", subtitle: "Get hired", color: "text-on-secondary bg-secondary scale-125 shadow-2xl border-none" }
   ];
 
   return (
-    <section className="py-32 text-center">
-      <h2 className="text-4xl md:text-5xl font-black font-display mb-24 text-foreground">Your Path to Wellness Pro</h2>
+    <section className="py-32 text-center" id="journey">
+      <h2 className="text-4xl md:text-5xl font-black font-display mb-6 text-foreground">Your candidate journey, simplified</h2>
+      <p className="mx-auto mb-24 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+        Move from confused job hunting to a more guided, modern process built around how wellness professionals actually discover and win opportunities.
+      </p>
       <div className="relative max-w-6xl mx-auto px-6">
         <div className="hidden lg:block absolute top-14 left-0 w-full h-[3px] bg-gradient-to-r from-primary/20 via-secondary/20 to-tertiary/20 z-0"></div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-16 gap-x-8 relative z-10">

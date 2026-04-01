@@ -13,14 +13,14 @@ export function Upskilling() {
   ];
 
   return (
-    <section className="py-24">
+    <section className="py-24" id="growth">
       <div className="bg-surface-container-low rounded-[4rem] p-10 md:p-20 relative overflow-hidden shadow-2xl border border-outline-variant/10">
         <div className="kinetic-blob w-[500px] h-[500px] bg-primary/10 top-0 right-0 blur-[120px]"></div>
         <div className="relative z-10 flex flex-col lg:flex-row gap-20 items-center">
           <div className="flex-1 space-y-10">
-            <h2 className="text-foreground text-5xl md:text-6xl font-black font-display leading-tight">Not ready yet? <br/>We&apos;ve got you 💪</h2>
+            <h2 className="text-foreground text-5xl md:text-6xl font-black font-display leading-tight">Still building your edge? <br/>Keep growing 💪</h2>
             <p className="text-muted-foreground text-xl leading-relaxed max-w-xl">
-              Bridge the skill gap with our curated certification programs and development courses designed by industry veterans.
+              Great roles go to candidates who keep improving. Use WJ India to strengthen your skills, build credibility, and stay ready for better opportunities.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
               {benefits.map((item, i) => (
@@ -31,7 +31,7 @@ export function Upskilling() {
               ))}
             </div>
             <Button size="lg" className="h-16 px-12 rounded-full signature-gradient text-on-primary font-black text-xl shadow-2xl hover:scale-105 transition-transform border-none">
-              Start Learning 🚀
+              Keep Improving
             </Button>
           </div>
           <div className="flex-1 grid grid-cols-2 gap-6 w-full lg:w-auto">

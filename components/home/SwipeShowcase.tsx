@@ -56,15 +56,15 @@ export function SwipeShowcase() {
         </div>
       </div>
       <div className="flex-1 order-1 lg:order-2 space-y-10">
-        <h2 className="text-5xl md:text-7xl font-black font-display leading-[1.05] text-foreground">Swipe. Match. <span className="text-secondary">Hired.</span></h2>
+        <h2 className="text-5xl md:text-7xl font-black font-display leading-[1.05] text-foreground">Swipe. Save. <span className="text-secondary">Stand out.</span></h2>
         <p className="text-xl text-muted-foreground leading-relaxed">
-          We&apos;ve transformed the job hunt into an experience you actually enjoy. Browse through India&apos;s top wellness startups and premium centers with a simple swipe.
+          WJ India turns job discovery into something faster and more intuitive. Explore wellness roles with a swipe-first experience that feels built for how candidates already browse and choose.
         </p>
         <ul className="space-y-6">
           {[
-            "Direct connection to HRs",
-            "Vetted high-paying wellness roles",
-            "Instant matching notification"
+            "Discover curated wellness opportunities quickly",
+            "Save promising roles without losing momentum",
+            "Apply with a cleaner, more candidate-friendly flow"
           ].map((item, i) => (
             <li key={i} className="flex items-center gap-5">
               <CheckCircle2 className="text-secondary size-8" />

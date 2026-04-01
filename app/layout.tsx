@@ -17,8 +17,8 @@ const beVietnamPro = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "Wellness Jobs India | Build Your Wellness Career",
-  description: "AI resumes, swipe jobs, and crack interviews — all in one sanctuary designed for the next generation of wellness professionals.",
+  title: "Wellnessjobsindia | Wellness Careers for Candidates",
+  description: "Discover wellness roles, build a better resume, prepare for interviews, and grow your career with candidate-first tools from Wellnessjobsindia.",
 };
 
 import { Header } from "@/components/layout/Header";

@@ -1,26 +1,32 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { FileText, Cpu, MousePointerClick } from "lucide-react";
+import { FileText, Sparkles, Target, WandSparkles } from "lucide-react";
 
 export function Features() {
   const features = [
     { 
       icon: <FileText className="size-8" />, 
-      title: "Resume in Seconds ⚡", 
-      desc: "Answer a few simple questions and let our AI craft a job-ready resume that highlights your wellness credentials instantly.",
+      title: "Build a resume that gets noticed", 
+      desc: "Turn your skills, certifications, and experience into a cleaner profile that is easier for employers to evaluate.",
       color: "bg-primary text-primary-foreground"
     },
     { 
-      icon: <Cpu className="size-8" />, 
-      title: "Ace Interviews 🎯", 
-      desc: "Practice with our AI-powered interview coach. Get real-time feedback on your responses and boost your hireability.",
+      icon: <Target className="size-8" />, 
+      title: "Practice before the real interview", 
+      desc: "Use guided prep to sharpen your responses, improve confidence, and show up more ready when opportunities come in.",
       color: "bg-secondary text-secondary-foreground"
     },
     { 
-      icon: <MousePointerClick className="size-8" />, 
-      title: "Swipe. Match. Get Hired 🔥", 
-      desc: "Forget boring job boards. Swipe right on jobs you love and get direct matches with top wellness centers in India.",
+      icon: <Sparkles className="size-8" />, 
+      title: "Discover roles in a way that feels natural", 
+      desc: "Swipe, save, and explore openings across wellness categories without the friction of a traditional job board.",
+      color: "bg-tertiary-container text-on-tertiary"
+    },
+    { 
+      icon: <WandSparkles className="size-8" />, 
+      title: "Grow your next move", 
+      desc: "Improve your profile over time with guided tools, clearer positioning, and candidate support that helps you stay job-ready.",
       color: "bg-tertiary-container text-on-tertiary"
     }
   ];
@@ -28,10 +34,12 @@ export function Features() {
   return (
     <section className="py-24">
       <div className="text-center mb-20">
-        <h2 className="text-4xl md:text-5xl font-black font-display mb-6">The Toolkit for Your Growth</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">Everything you need to navigate the wellness industry landscape with confidence.</p>
+        <h2 className="text-4xl md:text-5xl font-black font-display mb-6">Everything a wellness candidate needs in one place</h2>
+        <p className="text-muted-foreground max-w-3xl mx-auto text-lg leading-relaxed">
+          Wellnessjobsindia is designed around the candidate journey, from role discovery and resume building to interview preparation and long-term growth.
+        </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
         {features.map((f, i) => (
           <Card key={i} className="group p-10 rounded-3xl bg-muted/50 hover:bg-card transition-all duration-500 shadow-xl hover:shadow-2xl flex flex-col gap-8 border-transparent hover:border-primary/10 cursor-default">
             <CardContent className="p-0 space-y-8">
