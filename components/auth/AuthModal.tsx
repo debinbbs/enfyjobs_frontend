@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { cloneElement, type MouseEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,6 +9,11 @@ import { Input } from "@/components/ui/input";
 import { LoaderCircle, Sparkles, Verified } from "lucide-react";
 import { CountryCodeSelector } from "./CountryCodeSelector";
 import { countries, Country } from "@/lib/countries";
+import {
+  type CandidateTokenPayload,
+  saveCandidateLogin,
+  useCandidateSession,
+} from "@/lib/auth/candidate-session";
 
 interface AuthModalProps {
   children?: React.ReactElement;
@@ -18,8 +23,6 @@ type CandidateStep = "phone" | "otp" | "success";
 type CandidateAction = "send" | "verify" | null;
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001").replace(/\/$/, "");
-const CANDIDATE_SESSION_STORAGE_KEY = "enfyjobs:candidate-session";
-
 function getApiErrorMessage(payload: unknown, fallbackMessage: string) {
   if (!payload || typeof payload !== "object") {
     return fallbackMessage;
@@ -87,6 +90,7 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 
 export function AuthModal({ children }: AuthModalProps) {
   const router = useRouter();
+  const session = useCandidateSession();
   const [open, setOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country>(
     countries.find((c) => c.code === "IN") || countries[0]
@@ -118,6 +122,26 @@ export function AuthModal({ children }: AuthModalProps) {
   const candidatePhoneNumber = normalizeCandidatePhone(selectedCountry, candidatePhone);
   const isSendingOtp = candidateAction === "send";
   const isVerifyingOtp = candidateAction === "verify";
+  const defaultTrigger = (
+    <Button size="lg" className="rounded-full signature-gradient text-on-primary font-black shadow-xl hover:scale-105 transition-transform px-8 h-12">
+      {session ? "Open Dashboard" : "Get Started"}
+    </Button>
+  );
+
+  if (session) {
+    const sessionAwareTrigger = children || defaultTrigger;
+
+    return cloneElement(sessionAwareTrigger, {
+      ...sessionAwareTrigger.props,
+      onClick: (event: MouseEvent) => {
+        sessionAwareTrigger.props.onClick?.(event);
+
+        if (!event.defaultPrevented) {
+          router.push("/dashboard/candidate");
+        }
+      },
+    });
+  }
 
   const handleSendOtp = async () => {
     if (selectedCountry.code !== "IN") {
@@ -188,20 +212,7 @@ export function AuthModal({ children }: AuthModalProps) {
         throw new Error(getApiErrorMessage(payload, "Failed to verify OTP."));
       }
 
-      window.localStorage.setItem(
-        CANDIDATE_SESSION_STORAGE_KEY,
-        JSON.stringify({
-          ...(payload as object),
-          phoneNumber: candidatePhoneNumber,
-          loginAt: new Date().toISOString(),
-        })
-      );
-
-      window.dispatchEvent(
-        new CustomEvent("enfyjobs:candidate-authenticated", {
-          detail: payload,
-        })
-      );
+      saveCandidateLogin(payload as CandidateTokenPayload, candidatePhoneNumber);
 
       setCandidateStep("success");
       setCandidateMessage("Taking you to your candidate dashboard...");
@@ -219,11 +230,7 @@ export function AuthModal({ children }: AuthModalProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
-          children || (
-            <Button size="lg" className="rounded-full signature-gradient text-on-primary font-black shadow-xl hover:scale-105 transition-transform px-8 h-12">
-              Get Started
-            </Button>
-          )
+          children || defaultTrigger
         }
       />
       <DialogContent className="sm:max-w-none md:max-w-4xl w-[calc(100%-2rem)] p-0 overflow-hidden border-none rounded-[2rem] bg-transparent shadow-2xl">

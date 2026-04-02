@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CandidateSessionSync } from "@/components/auth/CandidateSessionSync";
 
 export default function RootLayout({
   children,
@@ -49,6 +50,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <CandidateSessionSync />
           <Header />
           {children}
           <Footer />

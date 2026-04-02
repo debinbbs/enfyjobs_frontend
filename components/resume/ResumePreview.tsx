@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { startTransition, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Mail, Phone, MapPin, Link2, Globe, ExternalLink, Star, GraduationCap, Briefcase, Award } from "lucide-react";
+import { Mail, Phone, MapPin, Link2, ExternalLink } from "lucide-react";
 
 /* ─── Interfaces ─────────────────────────────────────────────── */
 interface JourneyItem {
@@ -15,6 +15,17 @@ interface EducationItem { school: string; degree: string; year: string; }
 interface AchievementItem { name: string; duration?: string; description: string; link?: string; }
 interface SocialLinks { linkedin?: string; portfolio?: string; instagram?: string; youtube?: string; twitter?: string; }
 interface ReferenceItem { name: string; role: string; company: string; phone: string; }
+type ColumnKey = "sidebar" | "main";
+
+interface ResumeBlock {
+  id: string;
+  column: ColumnKey;
+  sectionId: string;
+  sectionTitle: string;
+  accent?: boolean;
+  wrapperClassName: string;
+  content: React.ReactNode;
+}
 
 interface ResumePreviewProps {
   name: string;
@@ -47,8 +58,8 @@ interface ResumePreviewProps {
 /* ─── Helper Components ──────────────────────────────────────── */
 function SectionHeading({ children, accent = false }: { children: React.ReactNode; accent?: boolean }) {
   return (
-    <div className="flex items-center gap-2 mb-3">
-      <span className={cn("text-[9px] font-black uppercase tracking-[0.25em]", accent ? "text-white/70" : "text-[#3730a3]")}>{children}</span>
+    <div className="flex items-center gap-2 pb-3">
+      <span className={cn("text-[10px] font-black uppercase tracking-[0.28em]", accent ? "text-white/75" : "text-[#3730a3]")}>{children}</span>
       <div className={cn("flex-1 h-px", accent ? "bg-white/20" : "bg-indigo-100")} />
     </div>
   );
@@ -56,10 +67,117 @@ function SectionHeading({ children, accent = false }: { children: React.ReactNod
 
 function SideTag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-block px-2.5 py-1 bg-white/20 text-white text-[8px] font-bold uppercase rounded tracking-wide leading-none">
+    <span className="inline-block rounded-md bg-white/20 px-3 py-1.5 text-[10px] font-bold uppercase leading-none tracking-wide text-white">
       {children}
     </span>
   );
+}
+
+const PAGE_WIDTH = 794;
+const PAGE_HEIGHT = 1123;
+const SIDEBAR_WIDTH = 276;
+const MAIN_WIDTH = PAGE_WIDTH - SIDEBAR_WIDTH;
+const SIDEBAR_HORIZONTAL_PADDING = 40;
+const MAIN_HORIZONTAL_PADDING = 48;
+const COLUMN_VERTICAL_PADDING = 48;
+const DEFAULT_HEADER_HEIGHT = 160;
+const DEFAULT_SECTION_HEADING_HEIGHT = 34;
+const MIN_SCALE = 0.48;
+
+function chunkList<T>(items: T[], size: number) {
+  const chunks: T[][] = [];
+
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+
+  return chunks;
+}
+
+function arePagesEqual(currentPages: string[][], nextPages: string[][]) {
+  if (currentPages.length !== nextPages.length) {
+    return false;
+  }
+
+  return currentPages.every((page, pageIndex) => {
+    const nextPage = nextPages[pageIndex];
+    return page.length === nextPage.length && page.every((item, itemIndex) => item === nextPage[itemIndex]);
+  });
+}
+
+function paginateBlocks(
+  blocks: ResumeBlock[],
+  blockHeights: Map<string, number>,
+  contentHeight: number,
+  headingHeights: { default: number; accent: number },
+) {
+  if (blocks.length === 0) {
+    return [[]];
+  }
+
+  const pages: string[][] = [[]];
+  let currentPageIndex = 0;
+  let usedHeight = 0;
+  let sectionIdsOnPage = new Set<string>();
+
+  blocks.forEach((block) => {
+    const blockHeight = blockHeights.get(block.id) ?? 0;
+    const headingHeight = sectionIdsOnPage.has(block.sectionId)
+      ? 0
+      : block.accent
+        ? headingHeights.accent
+        : headingHeights.default;
+    const requiredHeight = headingHeight + blockHeight;
+
+    if (pages[currentPageIndex].length > 0 && usedHeight + requiredHeight > contentHeight) {
+      pages.push([]);
+      currentPageIndex += 1;
+      usedHeight = 0;
+      sectionIdsOnPage = new Set<string>();
+    }
+
+    if (!sectionIdsOnPage.has(block.sectionId)) {
+      usedHeight += headingHeight;
+      sectionIdsOnPage.add(block.sectionId);
+    }
+
+    pages[currentPageIndex].push(block.id);
+    usedHeight += blockHeight;
+  });
+
+  return pages;
+}
+
+function formatSocialHandle(link: string) {
+  return link
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace("linkedin.com/in/", "@")
+    .replace(/\/$/, "");
+}
+
+function formatMonthYear(value: string) {
+  if (!value) {
+    return "";
+  }
+
+  if (value.toLowerCase() === "present") {
+    return "Present";
+  }
+
+  const parts = value.split("-");
+
+  if (parts.length < 2) {
+    return value;
+  }
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${months[parseInt(parts[1], 10) - 1] ?? ""} ${parts[0]}`;
+}
+
+function formatDateRange(duration: string) {
+  const [start, end] = duration.split(" - ");
+  return `${formatMonthYear(start)}${end ? ` – ${formatMonthYear(end)}` : ""}`;
 }
 
 /* ─── Main Component ─────────────────────────────────────────── */
@@ -70,7 +188,6 @@ export function ResumePreview({
   email,
   phone,
   personalSummary,
-  aura,
   vibe,
   journey,
   internships,
@@ -89,331 +206,547 @@ export function ResumePreview({
   highEnergy = false,
   profZen = false,
 }: ResumePreviewProps) {
-
+  const previewContainerRef = useRef<HTMLDivElement | null>(null);
+  const headerMeasureRef = useRef<HTMLDivElement | null>(null);
+  const defaultHeadingMeasureRef = useRef<HTMLDivElement | null>(null);
+  const accentHeadingMeasureRef = useRef<HTMLDivElement | null>(null);
+  const measureRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const defaultSummary = "Dedicated hospitality professional with a passion for delivering exceptional guest experiences. Committed to maintaining high professional standards in fast-paced hotel, restaurant, and wellness environments.";
+  const [scale, setScale] = useState(1);
+  const [sidebarPages, setSidebarPages] = useState<string[][]>([[]]);
+  const [mainPages, setMainPages] = useState<string[][]>([[]]);
 
-  /* ── format a date string like 2023-06-01 → Jun 2023 ── */
-  const fmtDate = (d: string) => {
-    if (!d) return "";
-    if (d.toLowerCase() === "present") return "Present";
-    const parts = d.split("-");
-    if (parts.length < 2) return d;
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    return `${months[parseInt(parts[1]) - 1] ?? ""} ${parts[0]}`;
-  };
-  const fmtRange = (dur: string) => {
-    const [s, e] = dur.split(" - ");
-    return `${fmtDate(s)}${e ? ` – ${fmtDate(e)}` : ""}`;
+  const contactLabel = socialLinks.linkedin ? formatSocialHandle(socialLinks.linkedin) : "";
+
+  const sidebarBlocks = useMemo(() => {
+    const blocks: ResumeBlock[] = [];
+
+    const addTagSection = (
+      sectionId: string,
+      sectionTitle: string,
+      items: string[],
+      chunkSize = 4,
+    ) => {
+      const chunks = chunkList(items.filter(Boolean), chunkSize);
+
+      chunks.forEach((chunk, chunkIndex) => {
+        blocks.push({
+          id: `${sectionId}-${chunkIndex}`,
+          column: "sidebar",
+          sectionId,
+          sectionTitle,
+          accent: true,
+          wrapperClassName: chunkIndex === chunks.length - 1 ? "pb-6" : "pb-3",
+          content: (
+            <div className="flex flex-wrap gap-2">
+              {chunk.map((item) => (
+                <SideTag key={`${sectionId}-${item}`}>{item}</SideTag>
+              ))}
+            </div>
+          ),
+        });
+      });
+    };
+
+    if (vibe.length > 0) {
+      addTagSection("skills", "Skills", vibe, 4);
+    }
+
+    if (softSkills.length > 0) {
+      addTagSection("soft-skills", "Soft Skills", softSkills, 4);
+    }
+
+    if (languages.length > 0) {
+      languages.forEach((language, index) => {
+        blocks.push({
+          id: `languages-${index}`,
+          column: "sidebar",
+          sectionId: "languages",
+          sectionTitle: "Languages",
+          accent: true,
+          wrapperClassName: index === languages.length - 1 ? "pb-6" : "pb-3",
+          content: (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[10px] font-bold text-white">{language.language}</span>
+              <span className="text-[9px] text-indigo-300">{language.level}</span>
+            </div>
+          ),
+        });
+      });
+    }
+
+    if (hobbies.length > 0) {
+      addTagSection("interests", "Interests", hobbies, 3);
+    }
+
+    if (availability || shiftPreference.length > 0) {
+      blocks.push({
+        id: "availability",
+        column: "sidebar",
+        sectionId: "availability",
+        sectionTitle: "Availability",
+        accent: true,
+        wrapperClassName: "pb-6",
+        content: (
+          <div className="space-y-1.5">
+            {availability ? <p className="text-[10px] font-bold text-indigo-200">{availability}</p> : null}
+            {shiftPreference.length > 0 ? (
+              <p className="text-[9px] leading-relaxed text-indigo-300">{shiftPreference.join(" · ")}</p>
+            ) : null}
+          </div>
+        ),
+      });
+    }
+
+    if (certifications.length > 0) {
+      certifications.forEach((certification, index) => {
+        blocks.push({
+          id: `certifications-${index}`,
+          column: "sidebar",
+          sectionId: "certifications",
+          sectionTitle: "Certifications",
+          accent: true,
+          wrapperClassName: index === certifications.length - 1 ? "pb-6" : "pb-3",
+          content: (
+            <div className="border-l border-indigo-500 pl-3 text-[9px] leading-[1.65] text-indigo-200">
+              {certification.link ? (
+                <a
+                  href={certification.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 transition hover:text-white"
+                >
+                  <span>{certification.title}</span>
+                  <ExternalLink className="size-3 opacity-70" />
+                </a>
+              ) : (
+                certification.title
+              )}
+            </div>
+          ),
+        });
+      });
+    }
+
+    if (awards.length > 0) {
+      awards.forEach((award, index) => {
+        blocks.push({
+          id: `awards-${index}`,
+          column: "sidebar",
+          sectionId: "recognition",
+          sectionTitle: "Recognition",
+          accent: true,
+          wrapperClassName: index === awards.length - 1 ? "pb-6" : "pb-3",
+          content: (
+            <p className="border-l border-yellow-500/60 pl-3 text-[9px] leading-[1.65] text-indigo-200">
+              {award}
+            </p>
+          ),
+        });
+      });
+    }
+
+    if (references.length > 0) {
+      references.forEach((reference, index) => {
+        blocks.push({
+          id: `references-${index}`,
+          column: "sidebar",
+          sectionId: "references",
+          sectionTitle: "References",
+          accent: true,
+          wrapperClassName: index === references.length - 1 ? "pb-6" : "pb-3",
+          content: (
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-white">{reference.name}</p>
+              <p className="text-[9px] leading-relaxed text-indigo-300">
+                {reference.role}
+                {reference.company ? `, ${reference.company}` : ""}
+              </p>
+              <p className="text-[9px] text-indigo-400">{reference.phone}</p>
+            </div>
+          ),
+        });
+      });
+    }
+
+    return blocks;
+  }, [availability, awards, certifications, hobbies, languages, references, shiftPreference, softSkills, vibe]);
+
+  const mainBlocks = useMemo(() => {
+    const blocks: ResumeBlock[] = [
+      {
+        id: "summary",
+        column: "main",
+        sectionId: "summary",
+        sectionTitle: "Professional Summary",
+        wrapperClassName: "pb-6",
+        content: (
+          <p className="text-[12px] leading-[1.75] text-slate-600">
+            {personalSummary || defaultSummary}
+          </p>
+        ),
+      },
+    ];
+
+    if (journey.length > 0) {
+      journey.forEach((item, index) => {
+        blocks.push({
+          id: `journey-${index}`,
+          column: "main",
+          sectionId: "journey",
+          sectionTitle: "Work Experience",
+          wrapperClassName: index === journey.length - 1 ? "pb-6" : "pb-4",
+          content: (
+            <div className="space-y-1.5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-black text-slate-800">{item.role}</p>
+                  <p className="text-[11px] font-semibold text-indigo-600">{item.company}</p>
+                </div>
+                <span className="mt-0.5 shrink-0 whitespace-nowrap text-[9px] font-medium text-slate-400">
+                  {formatDateRange(item.duration)}
+                </span>
+              </div>
+              {item.description ? (
+                <p className="text-[11px] leading-[1.7] text-slate-500">
+                  {item.description}
+                </p>
+              ) : null}
+            </div>
+          ),
+        });
+      });
+    }
+
+    if (internships.length > 0) {
+      internships.forEach((item, index) => {
+        blocks.push({
+          id: `internships-${index}`,
+          column: "main",
+          sectionId: "internships",
+          sectionTitle: "Internship Experience",
+          wrapperClassName: index === internships.length - 1 ? "pb-6" : "pb-4",
+          content: (
+            <div className="space-y-1.5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-black text-slate-800">{item.role}</p>
+                  <p className="text-[11px] font-semibold text-purple-600">{item.company}</p>
+                </div>
+                <span className="mt-0.5 shrink-0 whitespace-nowrap text-[9px] font-medium text-slate-400">
+                  {formatDateRange(item.duration)}
+                </span>
+              </div>
+              {item.description ? (
+                <p className="text-[11px] leading-[1.7] text-slate-500">
+                  {item.description}
+                </p>
+              ) : null}
+            </div>
+          ),
+        });
+      });
+    }
+
+    if (achievements.length > 0) {
+      achievements.forEach((achievement, index) => {
+        blocks.push({
+          id: `achievements-${index}`,
+          column: "main",
+          sectionId: "achievements",
+          sectionTitle: "Achievements & Training",
+          wrapperClassName: index === achievements.length - 1 ? "pb-6" : "pb-4",
+          content: (
+            <div className="space-y-1.5">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-[13px] font-black text-slate-800">{achievement.name}</p>
+                {achievement.duration ? (
+                  <span className="mt-0.5 shrink-0 whitespace-nowrap text-[9px] font-medium text-slate-400">
+                    {achievement.duration}
+                  </span>
+                ) : null}
+              </div>
+              {achievement.description ? (
+                <p className="text-[11px] leading-[1.7] text-slate-500">{achievement.description}</p>
+              ) : null}
+            </div>
+          ),
+        });
+      });
+    }
+
+    if (education.length > 0) {
+      education.forEach((item, index) => {
+        blocks.push({
+          id: `education-${index}`,
+          column: "main",
+          sectionId: "education",
+          sectionTitle: "Education",
+          wrapperClassName: index === education.length - 1 ? "pb-6" : "pb-4",
+          content: (
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[13px] font-black text-slate-800">{item.school}</p>
+                <p className="text-[11px] leading-relaxed text-slate-500">{item.degree}</p>
+              </div>
+              <span className="mt-0.5 shrink-0 whitespace-nowrap text-[9px] font-medium text-slate-400">
+                {item.year}
+              </span>
+            </div>
+          ),
+        });
+      });
+    }
+
+    return blocks;
+  }, [achievements, defaultSummary, education, internships, journey, personalSummary]);
+
+  const blockMap = useMemo(() => {
+    return new Map([...sidebarBlocks, ...mainBlocks].map((block) => [block.id, block]));
+  }, [mainBlocks, sidebarBlocks]);
+
+  useLayoutEffect(() => {
+    if (!previewContainerRef.current || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const updateScale = () => {
+      const containerWidth = previewContainerRef.current?.clientWidth ?? PAGE_WIDTH;
+      const nextScale = Math.min(1, Math.max(MIN_SCALE, (containerWidth - 32) / PAGE_WIDTH));
+
+      setScale((currentScale) => (Math.abs(currentScale - nextScale) < 0.01 ? currentScale : nextScale));
+    };
+
+    updateScale();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateScale();
+    });
+
+    resizeObserver.observe(previewContainerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const allBlocks = [...sidebarBlocks, ...mainBlocks];
+    const blockHeights = new Map<string, number>();
+
+    allBlocks.forEach((block) => {
+      const measuredHeight = measureRefs.current[block.id]?.offsetHeight ?? 0;
+      blockHeights.set(block.id, measuredHeight);
+    });
+
+    const headerHeight = headerMeasureRef.current?.offsetHeight ?? DEFAULT_HEADER_HEIGHT;
+    const headingHeights = {
+      default: defaultHeadingMeasureRef.current?.offsetHeight ?? DEFAULT_SECTION_HEADING_HEIGHT,
+      accent: accentHeadingMeasureRef.current?.offsetHeight ?? DEFAULT_SECTION_HEADING_HEIGHT,
+    };
+
+    const sidebarContentHeight = PAGE_HEIGHT - headerHeight - COLUMN_VERTICAL_PADDING;
+    const mainContentHeight = PAGE_HEIGHT - headerHeight - COLUMN_VERTICAL_PADDING;
+
+    const nextSidebarPages = paginateBlocks(sidebarBlocks, blockHeights, sidebarContentHeight, headingHeights);
+    const nextMainPages = paginateBlocks(mainBlocks, blockHeights, mainContentHeight, headingHeights);
+
+    startTransition(() => {
+      setSidebarPages((currentPages) => (arePagesEqual(currentPages, nextSidebarPages) ? currentPages : nextSidebarPages));
+      setMainPages((currentPages) => (arePagesEqual(currentPages, nextMainPages) ? currentPages : nextMainPages));
+    });
+  }, [mainBlocks, sidebarBlocks]);
+
+  const pageCount = Math.max(sidebarPages.length, mainPages.length, 1);
+
+  const renderHeader = () => (
+    <div
+      className={cn(
+        "bg-[#312e81] px-7 pb-6 pt-7",
+        profZen && !highEnergy ? "bg-[linear-gradient(135deg,#312e81_0%,#334155_100%)]" : undefined,
+      )}
+    >
+      <div className="flex items-center gap-5">
+        <div className="flex-1">
+          <h1 className="text-[32px] font-black leading-none tracking-tight text-white">
+            {name || "Your Name"}
+          </h1>
+          <p className="mt-2 text-[12px] font-black uppercase tracking-[0.24em] text-indigo-200">
+            {title || "Hospitality Professional"}
+          </p>
+        </div>
+
+        <div className="shrink-0">
+          {profileImage ? (
+            <img
+              src={profileImage}
+              alt={name}
+              className="size-20 rounded-full border-[3px] border-white/30 object-cover shadow-lg"
+            />
+          ) : (
+            <div className="flex size-20 items-center justify-center rounded-full border-[3px] border-white/20 bg-white/10 shadow-lg">
+              <span className="text-2xl font-black text-white">
+                {name ? name.charAt(0).toUpperCase() : "?"}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-medium text-indigo-100">
+        {email ? (
+          <span className="flex items-center gap-2">
+            <Mail className="size-3.5 shrink-0" />
+            {email}
+          </span>
+        ) : null}
+        {phone ? (
+          <span className="flex items-center gap-2">
+            <Phone className="size-3.5 shrink-0" />
+            {phone}
+          </span>
+        ) : null}
+        {location ? (
+          <span className="flex items-center gap-2">
+            <MapPin className="size-3.5 shrink-0" />
+            {location}
+          </span>
+        ) : null}
+        {contactLabel ? (
+          <span className="flex items-center gap-2">
+            <Link2 className="size-3.5 shrink-0" />
+            {contactLabel}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  const renderColumnBlocks = (pageBlockIds: string[]) => {
+    let previousSectionId = "";
+
+    return pageBlockIds.map((blockId) => {
+      const block = blockMap.get(blockId);
+
+      if (!block) {
+        return null;
+      }
+
+      const showHeading = block.sectionId !== previousSectionId;
+      previousSectionId = block.sectionId;
+
+      return (
+        <React.Fragment key={block.id}>
+          {showHeading ? <SectionHeading accent={block.accent}>{block.sectionTitle}</SectionHeading> : null}
+          <div className={block.wrapperClassName}>{block.content}</div>
+        </React.Fragment>
+      );
+    });
   };
 
   return (
-    /* Outer preview shell */
-    <div className={cn(
-      "sticky top-[130px] rounded-[2rem] shadow-2xl border border-white/40 overflow-hidden bg-white font-body",
-      "max-h-[calc(100vh-160px)] overflow-y-auto",
-      "animate-in fade-in slide-in-from-right-8 duration-700"
-    )}>
-
-      {/* Preview label */}
-      <div className="flex items-center justify-between px-5 py-2.5 bg-slate-900 text-white">
+    <div
+      ref={previewContainerRef}
+      className={cn(
+        "sticky top-[130px] overflow-hidden rounded-[2rem] border border-white/40 bg-white font-body shadow-2xl",
+        "animate-in fade-in slide-in-from-right-8 duration-700",
+      )}
+    >
+      <div className="flex items-center justify-between bg-slate-900 px-5 py-2.5 text-white">
         <div className="flex items-center gap-2">
-          <span className={cn("size-2 rounded-full animate-pulse", highEnergy ? "bg-indigo-400" : "bg-emerald-400")} />
+          <span
+            className={cn(
+              "size-2 rounded-full animate-pulse",
+              highEnergy ? "bg-indigo-400" : profZen ? "bg-sky-400" : "bg-emerald-400",
+            )}
+          />
           <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">Live Preview</span>
         </div>
-        <span className="text-[8px] text-slate-500 font-medium uppercase tracking-widest">A4 Format</span>
+        <span className="text-[8px] font-medium uppercase tracking-widest text-slate-500">
+          A4 Format - {pageCount} Page{pageCount > 1 ? "s" : ""}
+        </span>
       </div>
 
-      {/* ══════════════ RESUME DOCUMENT ══════════════ */}
-      <div className="bg-white">
+      <div className="bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.08),_transparent_35%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] px-4 py-5">
+        <div className="flex flex-col items-center gap-6" data-resume-pages-root>
+          {Array.from({ length: pageCount }, (_, pageIndex) => {
+            const sidebarPageIds = sidebarPages[pageIndex] ?? [];
+            const mainPageIds = mainPages[pageIndex] ?? [];
 
-        {/* ── HEADER BAND ────────────────────────────────── */}
-        <div className="bg-[#312e81] px-6 pt-5 pb-4">
+            return (
+              <div
+                key={`resume-page-${pageIndex}`}
+                className="relative"
+                data-resume-page-frame
+                data-page-width={PAGE_WIDTH}
+                data-page-height={PAGE_HEIGHT}
+                style={{ height: PAGE_HEIGHT * scale, width: PAGE_WIDTH * scale }}
+              >
+                <div
+                  className="origin-top-left flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-[0_22px_60px_rgba(49,46,129,0.18)]"
+                  data-resume-page-surface
+                  data-page-width={PAGE_WIDTH}
+                  data-page-height={PAGE_HEIGHT}
+                  style={{ height: PAGE_HEIGHT, width: PAGE_WIDTH, transform: `scale(${scale})` }}
+                >
+                  {renderHeader()}
 
-          <div className="flex items-center gap-4">
-            {/* Name + Title */}
-            <div className="flex-1">
-              <h1 className="text-xl font-black text-white tracking-tight leading-none">
-                {name || "Your Name"}
-              </h1>
-              <p className="text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em] mt-1">
-                {title || "Hospitality Professional"}
-              </p>
-            </div>
-
-            {/* Profile Photo */}
-            <div className="shrink-0">
-              {profileImage ? (
-                <img
-                  src={profileImage}
-                  alt={name}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-white/30 shadow-lg"
-                />
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center shadow-lg">
-                  <span className="text-white text-lg font-black">
-                    {name ? name.charAt(0).toUpperCase() : "?"}
-                  </span>
+                  <div className="grid flex-1 grid-cols-[276px_minmax(0,1fr)]">
+                    <aside className="overflow-hidden bg-[#1e1b4b] px-5 py-6">
+                      {renderColumnBlocks(sidebarPageIds)}
+                    </aside>
+                    <main className="min-w-0 overflow-hidden bg-white px-6 py-6">
+                      {renderColumnBlocks(mainPageIds)}
+                    </main>
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
-          {/* Contact strip */}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-3 text-[9px] text-indigo-200 font-medium">
-            {email && (
-              <span className="flex items-center gap-1.5">
-                <Mail className="size-3 shrink-0" />{email}
-              </span>
-            )}
-            {phone && (
-              <span className="flex items-center gap-1.5">
-                <Phone className="size-3 shrink-0" />{phone}
-              </span>
-            )}
-            {location && (
-              <span className="flex items-center gap-1.5">
-                <MapPin className="size-3 shrink-0" />{location}
-              </span>
-            )}
-            {socialLinks.linkedin && (
-              <span className="flex items-center gap-1.5">
-                <Link2 className="size-3 shrink-0" />
-                {socialLinks.linkedin.replace("https://", "").replace("linkedin.com/in/", "@")}
-              </span>
-            )}
-          </div>
+      <div className="pointer-events-none absolute left-[-10000px] top-0 opacity-0" aria-hidden>
+        <div ref={headerMeasureRef} style={{ width: PAGE_WIDTH }}>
+          {renderHeader()}
         </div>
 
-        {/* ── BODY: two-column ───────────────────────────── */}
-        <div className="flex min-h-0">
-
-          {/* ┌── LEFT SIDEBAR ──────────────────────────────┐ */}
-          <aside className="w-[35%] shrink-0 bg-[#1e1b4b] px-4 py-5 space-y-5">
-
-            {/* Professional Skills */}
-            {vibe.length > 0 && (
-              <div>
-                <SectionHeading accent>Skills</SectionHeading>
-                <div className="flex flex-wrap gap-1.5">
-                  {vibe.map(s => <SideTag key={s}>{s}</SideTag>)}
-                </div>
-              </div>
-            )}
-
-            {/* Soft Skills */}
-            {softSkills.length > 0 && (
-              <div>
-                <SectionHeading accent>Soft Skills</SectionHeading>
-                <div className="flex flex-wrap gap-1.5">
-                  {softSkills.map(s => <SideTag key={s}>{s}</SideTag>)}
-                </div>
-              </div>
-            )}
-
-            {/* Languages */}
-            {languages.length > 0 && (
-              <div>
-                <SectionHeading accent>Languages</SectionHeading>
-                <ul className="space-y-1.5">
-                  {languages.map((l, i) => (
-                    <li key={i} className="flex items-center justify-between">
-                      <span className="text-white text-[9px] font-bold">{l.language}</span>
-                      <span className="text-indigo-300 text-[8px]">{l.level}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Hobbies */}
-            {hobbies.length > 0 && (
-              <div>
-                <SectionHeading accent>Interests</SectionHeading>
-                <div className="flex flex-wrap gap-1.5">
-                  {hobbies.map(h => <SideTag key={h}>{h}</SideTag>)}
-                </div>
-              </div>
-            )}
-
-            {/* Availability */}
-            {(availability || shiftPreference.length > 0) && (
-              <div>
-                <SectionHeading accent>Availability</SectionHeading>
-                <div className="space-y-1">
-                  {availability && (
-                    <p className="text-indigo-200 text-[9px] font-bold">{availability}</p>
-                  )}
-                  {shiftPreference.length > 0 && (
-                    <p className="text-indigo-300 text-[8px]">{shiftPreference.join(" · ")}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Certifications */}
-            {certifications.length > 0 && (
-              <div>
-                <SectionHeading accent>Certifications</SectionHeading>
-                <ul className="space-y-1.5">
-                  {certifications.map((c, i) => (
-                    <li key={i} className="text-indigo-200 text-[8px] leading-snug pl-2 border-l border-indigo-500">
-                      {c.link ? (
-                        <a href={c.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-white">
-                          {c.title} <ExternalLink className="size-2.5 opacity-70" />
-                        </a>
-                      ) : c.title}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Awards / Recognition */}
-            {awards.length > 0 && (
-              <div>
-                <SectionHeading accent>Recognition</SectionHeading>
-                <ul className="space-y-1.5">
-                  {awards.map((a, i) => (
-                    <li key={i} className="text-indigo-200 text-[8px] leading-snug pl-2 border-l border-yellow-500/60">
-                      {a}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* References */}
-            {references.length > 0 && (
-              <div>
-                <SectionHeading accent>References</SectionHeading>
-                <div className="space-y-3">
-                  {references.map((r, i) => (
-                    <div key={i} className="space-y-0.5">
-                      <p className="text-white text-[9px] font-black">{r.name}</p>
-                      <p className="text-indigo-300 text-[8px]">{r.role}{r.company ? `, ${r.company}` : ""}</p>
-                      <p className="text-indigo-400 text-[8px]">{r.phone}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </aside>
-          {/* └─────────────────────────────────────────────┘ */}
-
-          {/* ┌── MAIN CONTENT ──────────────────────────────┐ */}
-          <main className="flex-1 px-5 py-5 space-y-5 bg-white min-w-0">
-
-            {/* Professional Summary */}
-            <div>
-              <SectionHeading>Professional Summary</SectionHeading>
-              <p className="text-[10px] text-slate-600 leading-relaxed">
-                {personalSummary || defaultSummary}
-              </p>
+        <div className="flex gap-10 pt-6" style={{ width: PAGE_WIDTH }}>
+          <div style={{ width: SIDEBAR_WIDTH - SIDEBAR_HORIZONTAL_PADDING }}>
+            <div ref={accentHeadingMeasureRef}>
+              <SectionHeading accent>Skills</SectionHeading>
             </div>
-
-            {/* Work Experience */}
-            {journey.length > 0 && (
-              <div>
-                <SectionHeading>Work Experience</SectionHeading>
-                <div className="space-y-4">
-                  {journey.map((item, idx) => (
-                    <div key={idx}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-[10px] font-black text-slate-800">{item.role}</p>
-                          <p className="text-[9px] text-indigo-600 font-semibold">{item.company}</p>
-                        </div>
-                        <span className="text-[8px] text-slate-400 font-medium whitespace-nowrap shrink-0 mt-0.5">
-                          {fmtRange(item.duration)}
-                        </span>
-                      </div>
-                      {item.description && (
-                        <p className="text-[9px] text-slate-500 leading-relaxed mt-1 line-clamp-3">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
+            {sidebarBlocks.map((block) => (
+              <div
+                key={`measure-${block.id}`}
+                ref={(node) => {
+                  measureRefs.current[block.id] = node;
+                }}
+                className={block.wrapperClassName}
+              >
+                {block.content}
               </div>
-            )}
+            ))}
+          </div>
 
-            {/* Internships */}
-            {internships.length > 0 && (
-              <div>
-                <SectionHeading>Internship Experience</SectionHeading>
-                <div className="space-y-4">
-                  {internships.map((item, idx) => (
-                    <div key={idx}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-[10px] font-black text-slate-800">{item.role}</p>
-                          <p className="text-[9px] text-purple-600 font-semibold">{item.company}</p>
-                        </div>
-                        <span className="text-[8px] text-slate-400 font-medium whitespace-nowrap shrink-0 mt-0.5">
-                          {fmtRange(item.duration)}
-                        </span>
-                      </div>
-                      {item.description && (
-                        <p className="text-[9px] text-slate-500 leading-relaxed mt-1 line-clamp-3">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
+          <div style={{ width: MAIN_WIDTH - MAIN_HORIZONTAL_PADDING }}>
+            <div ref={defaultHeadingMeasureRef}>
+              <SectionHeading>Professional Summary</SectionHeading>
+            </div>
+            {mainBlocks.map((block) => (
+              <div
+                key={`measure-${block.id}`}
+                ref={(node) => {
+                  measureRefs.current[block.id] = node;
+                }}
+                className={block.wrapperClassName}
+              >
+                {block.content}
               </div>
-            )}
-
-            {/* Achievements & Training */}
-            {achievements.length > 0 && (
-              <div>
-                <SectionHeading>Achievements &amp; Training</SectionHeading>
-                <div className="space-y-3">
-                  {achievements.map((a, idx) => (
-                    <div key={idx}>
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-[10px] font-black text-slate-800">{a.name}</p>
-                        {a.duration && (
-                          <span className="text-[8px] text-slate-400 font-medium whitespace-nowrap shrink-0 mt-0.5">
-                            {a.duration}
-                          </span>
-                        )}
-                      </div>
-                      {a.description && (
-                        <p className="text-[9px] text-slate-500 leading-relaxed mt-0.5">{a.description}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Education */}
-            {education.length > 0 && (
-              <div>
-                <SectionHeading>Education</SectionHeading>
-                <div className="space-y-3">
-                  {education.map((edu, i) => (
-                    <div key={i} className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="text-[10px] font-black text-slate-800">{edu.school}</p>
-                        <p className="text-[9px] text-slate-500">{edu.degree}</p>
-                      </div>
-                      <span className="text-[8px] text-slate-400 font-medium whitespace-nowrap shrink-0 mt-0.5">
-                        {edu.year}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-          </main>
-          {/* └─────────────────────────────────────────────┘ */}
-
-        </div>{/* end body */}
-      </div>{/* end resume doc */}
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

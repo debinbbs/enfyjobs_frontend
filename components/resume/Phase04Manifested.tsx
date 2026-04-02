@@ -1,27 +1,33 @@
 "use client";
 
 import React from "react";
-import { 
-  Download, 
-  Share2, 
-  Zap, 
-  CheckCircle2, 
+import {
+  Download,
+  Share2,
+  Zap,
+  CheckCircle2,
   ArrowRight,
-  Sparkles,
   Globe,
   Link2
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 
 interface Phase04Props {
   onBack: () => void;
   onExploreMatches: () => void;
+  onDownloadResume: () => void;
+  isDownloadingResume?: boolean;
+  downloadFeedback?: string;
+  downloadFeedbackTone?: "default" | "success" | "error";
 }
 
 export function Phase04Manifested({ 
   onBack,
-  onExploreMatches
+  onExploreMatches,
+  onDownloadResume,
+  isDownloadingResume = false,
+  downloadFeedback,
+  downloadFeedbackTone = "default"
 }: Phase04Props) {
   return (
     <div className="space-y-12 pb-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -68,9 +74,28 @@ export function Phase04Manifested({
               High-resolution, ATS-optimized, and aesthetically superior.
             </p>
           </div>
-          <button className="w-full py-5 bg-primary rounded-full text-white font-black uppercase tracking-[0.2em] text-xs shadow-xl transition-all hover:scale-[1.02] active:scale-95">
-            Export Resume
+          <button
+            type="button"
+            onClick={onDownloadResume}
+            disabled={isDownloadingResume}
+            className="w-full py-5 bg-primary rounded-full text-white font-black uppercase tracking-[0.2em] text-xs shadow-xl transition-all hover:scale-[1.02] active:scale-95"
+          >
+            {isDownloadingResume ? "Exporting..." : "Export Resume"}
           </button>
+          {downloadFeedback ? (
+            <p
+              className={[
+                "text-xs font-bold leading-relaxed",
+                downloadFeedbackTone === "error"
+                  ? "text-red-600"
+                  : downloadFeedbackTone === "success"
+                    ? "text-emerald-700"
+                    : "text-slate-500",
+              ].join(" ")}
+            >
+              {downloadFeedback}
+            </p>
+          ) : null}
         </motion.div>
 
         <motion.div 
