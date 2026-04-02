@@ -11,6 +11,8 @@ import {
 function ResumeExportPageContent() {
   const searchParams = useSearchParams();
   const exportKey = searchParams.get("key");
+  const payloadParam = searchParams.get("payload");
+  const mode = searchParams.get("mode");
   const [hasTriggeredPrint, setHasTriggeredPrint] = useState(false);
 
   const resolvedExport = useMemo(() => {
@@ -20,6 +22,26 @@ function ResumeExportPageContent() {
         errorMessage: "",
         isReady: false,
       };
+    }
+
+    if (payloadParam) {
+      try {
+        const normalizedPayload = payloadParam.replace(/-/g, "+").replace(/_/g, "/");
+        const padding = normalizedPayload.length % 4 === 0 ? "" : "=".repeat(4 - (normalizedPayload.length % 4));
+        const decodedPayload = window.atob(`${normalizedPayload}${padding}`);
+
+        return {
+          payload: JSON.parse(decodedPayload) as ResumePrintDocumentProps,
+          errorMessage: "",
+          isReady: true,
+        };
+      } catch {
+        return {
+          payload: null,
+          errorMessage: "Resume export data could not be decoded. Please try again.",
+          isReady: true,
+        };
+      }
     }
 
     if (!exportKey) {
@@ -53,10 +75,10 @@ function ResumeExportPageContent() {
         isReady: true,
       };
     }
-  }, [exportKey]);
+  }, [exportKey, payloadParam]);
 
   useEffect(() => {
-    if (!resolvedExport.payload || !exportKey || hasTriggeredPrint) {
+    if (!resolvedExport.payload || hasTriggeredPrint || mode === "pdf") {
       return;
     }
 
@@ -72,15 +94,19 @@ function ResumeExportPageContent() {
       setHasTriggeredPrint(true);
     }, 500);
 
-    const cleanupTimeout = window.setTimeout(() => {
-      window.localStorage.removeItem(exportKey);
-    }, 5 * 60 * 1000);
+    const cleanupTimeout = exportKey
+      ? window.setTimeout(() => {
+          window.localStorage.removeItem(exportKey);
+        }, 5 * 60 * 1000)
+      : null;
 
     return () => {
       window.clearTimeout(printTimeout);
-      window.clearTimeout(cleanupTimeout);
+      if (cleanupTimeout) {
+        window.clearTimeout(cleanupTimeout);
+      }
     };
-  }, [exportKey, hasTriggeredPrint, resolvedExport.payload]);
+  }, [exportKey, hasTriggeredPrint, mode, resolvedExport.payload]);
 
   const pageTitle = resolvedExport.payload?.name
     ? `${resolvedExport.payload.name} Resume`

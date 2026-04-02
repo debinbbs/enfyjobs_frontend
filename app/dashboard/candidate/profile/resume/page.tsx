@@ -1,10 +1,12 @@
-import { CandidateResumeBuilder } from "@/components/resume/CandidateResumeBuilder";
+import { ResumeBuilderModeSelector } from "@/components/resume/ResumeBuilderModeSelector";
 
 export default function CandidateProfileResumePage() {
   return (
-    <CandidateResumeBuilder
-      heading="Turn your candidate profile into a polished, reusable resume."
-      description="Bring your experience, certifications, skills, and references together in one builder that saves directly to your account database."
+    <ResumeBuilderModeSelector
+      heading="Choose how you want to build your resume."
+      description="Go manual if you want full section-by-section control, or open the AI co-pilot to build with chat, voice input, and a live resume preview."
+      manualHref="/dashboard/candidate/profile/resume/manual"
+      aiHref="/dashboard/candidate/profile/resume/ai"
       backHref="/dashboard/candidate/profile"
       backLabel="Back To Profile"
     />

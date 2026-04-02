@@ -1,0 +1,54 @@
+<svg width="900" height="1200" viewBox="0 0 900 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="1200" fill="#201A31"/>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <circle cx="722" cy="170" r="180" fill="url(#glowA)" opacity="0.9"/>
+  <circle cx="182" cy="266" r="220" fill="url(#glowB)" opacity="0.75"/>
+  <circle cx="700" cy="960" r="260" fill="url(#glowC)" opacity="0.55"/>
+  <rect x="122" y="128" width="312" height="392" rx="36" fill="#2A1F3E" opacity="0.82"/>
+  <rect x="146" y="152" width="264" height="344" rx="28" fill="#F8E7D8"/>
+  <rect x="170" y="176" width="216" height="296" rx="20" fill="url(#mirror)"/>
+  <circle cx="278" cy="286" r="78" fill="#E1B7A1"/>
+  <path d="M205 381C205 334.056 243.056 296 290 296H306C352.944 296 391 334.056 391 381V472H205V381Z" fill="#D78C74"/>
+  <path d="M232 258C232 214.922 266.922 180 310 180H316C359.078 180 394 214.922 394 258V268H232V258Z" fill="#251C2A"/>
+  <circle cx="218" cy="204" r="16" fill="#FFF3EA"/>
+  <circle cx="366" cy="204" r="16" fill="#FFF3EA"/>
+  <rect x="542" y="654" width="208" height="238" rx="48" fill="#FFF5EF" opacity="0.96"/>
+  <rect x="560" y="684" width="172" height="26" rx="13" fill="#D6A6AE"/>
+  <rect x="584" y="730" width="124" height="124" rx="62" fill="url(#compactMirror)"/>
+  <circle cx="646" cy="791" r="34" fill="#E6BCA8"/>
+  <path d="M594 864C594 834.177 618.177 810 648 810C677.823 810 702 834.177 702 864V892H594V864Z" fill="#A25A6B"/>
+  <rect x="514" y="904" width="262" height="52" rx="26" fill="#F2D7C7" opacity="0.9"/>
+  <path d="M452 636L516 558" stroke="#F9E6D6" stroke-width="20" stroke-linecap="round"/>
+  <path d="M518 559L590 635" stroke="#D59276" stroke-width="18" stroke-linecap="round"/>
+  <rect x="450" y="620" width="40" height="160" rx="20" transform="rotate(-41 450 620)" fill="#2C233F"/>
+  <rect x="478" y="646" width="36" height="152" rx="18" transform="rotate(-41 478 646)" fill="#D7987E"/>
+  <path d="M641 168C715 214 748 296 744 358" stroke="#FFF3EA" stroke-width="14" stroke-linecap="round" opacity="0.56"/>
+  <path d="M594 237C653 256 705 301 729 350" stroke="#FCE2CE" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+  <defs>
+    <linearGradient id="bg" x1="120" y1="64" x2="802" y2="1102" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3E8FF"/>
+      <stop offset="0.45" stop-color="#DCC6FF"/>
+      <stop offset="1" stop-color="#7C4DFF"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(722 170) rotate(90) scale(180)">
+      <stop stop-color="#FFF6B8"/>
+      <stop offset="1" stop-color="#FFF6B8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(182 266) rotate(90) scale(220)">
+      <stop stop-color="#FFB7C5"/>
+      <stop offset="1" stop-color="#FFB7C5" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowC" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(700 960) rotate(90) scale(260)">
+      <stop stop-color="#9EF8FF"/>
+      <stop offset="1" stop-color="#9EF8FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mirror" x1="278" y1="176" x2="278" y2="472" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDFB"/>
+      <stop offset="1" stop-color="#F4C9B8"/>
+    </linearGradient>
+    <linearGradient id="compactMirror" x1="646" y1="730" x2="646" y2="854" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF9F4"/>
+      <stop offset="1" stop-color="#F2D0BF"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -14,6 +14,33 @@ import type { Swiper as SwiperType } from 'swiper';
 const JOBS = [
   {
     id: 1,
+    title: "Makeup Artist",
+    company: "Glow Theory Studio",
+    location: "Mumbai",
+    badge: "Beauty",
+    image: "/images/home/hero/makeup-artist.svg",
+    match: 97
+  },
+  {
+    id: 2,
+    title: "Hair Stylist",
+    company: "Muse Salon",
+    location: "Bangalore",
+    badge: "Hair",
+    image: "/images/home/hero/hair-stylist.svg",
+    match: 95
+  },
+  {
+    id: 3,
+    title: "Salon Manager",
+    company: "Studio Mane",
+    location: "Delhi",
+    badge: "Salon Ops",
+    image: "/images/home/hero/salon-manager.svg",
+    match: 94
+  },
+  {
+    id: 4,
     title: "Yoga Instructor",
     company: "Ananda Wellness",
     location: "Mumbai",
@@ -22,7 +49,7 @@ const JOBS = [
     match: 98
   },
   {
-    id: 2,
+    id: 5,
     title: "Wellness Coach",
     company: "Serenity Stays",
     location: "Bangalore",
@@ -31,7 +58,7 @@ const JOBS = [
     match: 95
   },
   {
-    id: 3,
+    id: 6,
     title: "Nutritionist",
     company: "Vitality Pro",
     location: "Delhi",
@@ -40,7 +67,7 @@ const JOBS = [
     match: 92
   },
   {
-    id: 4,
+    id: 7,
     title: "Therapist",
     company: "Mind Sanctuary",
     location: "Pune",

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Download, FileText, RotateCcw, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,20 +11,8 @@ import { Phase02Journey } from "@/components/resume/Phase02Journey";
 import { Phase03VibeCheck } from "@/components/resume/Phase03VibeCheck";
 import { Phase04Manifested } from "@/components/resume/Phase04Manifested";
 import { ResumePreview } from "@/components/resume/ResumePreview";
-import type { ResumePrintDocumentProps } from "@/components/resume/ResumePrintDocument";
 import { StepIndicator } from "@/components/resume/StepIndicator";
-import {
-  buildCandidateProfileFromApi,
-  buildCandidateProfileSeed,
-  type CandidateProfileDraft,
-} from "@/lib/auth/candidate-profile";
-import { useCandidateSession } from "@/lib/auth/candidate-session";
-import {
-  buildCandidateResumeFromApi,
-  buildCandidateResumeRequest,
-  buildCandidateResumeSeed,
-  type CandidateResumeDraft,
-} from "@/lib/resume/candidate-resume";
+import { useResumeBuilderWorkspace } from "@/components/resume/useResumeBuilderWorkspace";
 
 const steps = [
   { id: 1, label: "Set Your Vibe" },
@@ -33,45 +21,12 @@ const steps = [
   { id: 4, label: "Manifested" },
 ];
 
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"
-).replace(/\/$/, "");
-
 type CandidateResumeBuilderProps = {
   heading: string;
   description: string;
   backHref: string;
   backLabel: string;
 };
-
-function getApiErrorMessage(payload: unknown, fallbackMessage: string) {
-  if (!payload || typeof payload !== "object") {
-    return fallbackMessage;
-  }
-
-  const message = (payload as { message?: string | string[] }).message;
-  if (Array.isArray(message)) {
-    return message.join(", ");
-  }
-
-  return typeof message === "string" ? message : fallbackMessage;
-}
-
-function formatSavedAt(value: string | null) {
-  if (!value) {
-    return null;
-  }
-
-  const timestamp = Date.parse(value);
-  if (Number.isNaN(timestamp)) {
-    return null;
-  }
-
-  return new Intl.DateTimeFormat("en-IN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(timestamp);
-}
 
 export function CandidateResumeBuilder({
   heading,
@@ -80,119 +35,25 @@ export function CandidateResumeBuilder({
   backLabel,
 }: CandidateResumeBuilderProps) {
   const router = useRouter();
-  const session = useCandidateSession();
   const [currentStep, setCurrentStep] = useState(1);
-  const [resume, setResume] = useState<CandidateResumeDraft | null>(null);
-  const [profileSnapshot, setProfileSnapshot] = useState<CandidateProfileDraft | null>(null);
-  const [initialResume, setInitialResume] = useState<CandidateResumeDraft | null>(null);
-  const [isLoadingResume, setIsLoadingResume] = useState(false);
-  const [isSavingResume, setIsSavingResume] = useState(false);
-  const [isDownloadingResume, setIsDownloadingResume] = useState(false);
-  const [downloadFeedback, setDownloadFeedback] = useState("");
-  const [downloadFeedbackTone, setDownloadFeedbackTone] = useState<"default" | "success" | "error">("default");
-  const [statusMessage, setStatusMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!session) {
-      router.replace("/");
-    }
-  }, [router, session]);
-
-  useEffect(() => {
-    const phoneNumber = session?.phoneNumber;
-    if (!phoneNumber) {
-      return;
-    }
-
-    let isCancelled = false;
-
-    const loadResume = async () => {
-      setIsLoadingResume(true);
-      setErrorMessage("");
-      setStatusMessage("");
-
-      const fallbackProfile = buildCandidateProfileSeed(session);
-
-      try {
-        const [profileResponse, resumeResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/users/candidate-profile/${encodeURIComponent(phoneNumber)}`),
-          fetch(`${API_BASE_URL}/users/candidate-resume/${encodeURIComponent(phoneNumber)}`),
-        ]);
-
-        const [profilePayload, resumePayload] = await Promise.all([
-          profileResponse.json().catch(() => null),
-          resumeResponse.json().catch(() => null),
-        ]);
-
-        const nextProfile = profileResponse.ok
-          ? buildCandidateProfileFromApi(
-              profilePayload as Parameters<typeof buildCandidateProfileFromApi>[0],
-              session
-            )
-          : fallbackProfile;
-
-        const nextResume =
-          resumeResponse.ok &&
-          (resumePayload as { resume?: { content?: unknown; updatedAt?: string | null } | null })
-            ?.resume?.content
-            ? buildCandidateResumeFromApi(
-                (resumePayload as { resume?: { content?: unknown } | null }).resume?.content,
-                session,
-                nextProfile
-              )
-            : buildCandidateResumeSeed(session, nextProfile);
-
-        if (isCancelled) {
-          return;
-        }
-
-        setProfileSnapshot(nextProfile);
-        setResume(nextResume);
-        setInitialResume(nextResume);
-        setLastSavedAt(
-          resumeResponse.ok
-            ? (resumePayload as { resume?: { updatedAt?: string | null } | null }).resume
-                ?.updatedAt ?? null
-            : null
-        );
-
-        if (!profileResponse.ok) {
-          setErrorMessage(
-            getApiErrorMessage(profilePayload, "Profile details could not be loaded. Using session defaults.")
-          );
-        } else if (!resumeResponse.ok) {
-          setStatusMessage("Start building your resume. It will save to your account.");
-        }
-      } catch (error) {
-        if (isCancelled) {
-          return;
-        }
-
-        const nextProfile = buildCandidateProfileSeed(session);
-        const nextResume = buildCandidateResumeSeed(session, nextProfile);
-        setProfileSnapshot(nextProfile);
-        setResume(nextResume);
-        setInitialResume(nextResume);
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Failed to load your resume builder."
-        );
-      } finally {
-        if (!isCancelled) {
-          setIsLoadingResume(false);
-        }
-      }
-    };
-
-    void loadResume();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [session]);
+  const {
+    session,
+    resume,
+    isLoadingResume,
+    isSavingResume,
+    isDownloadingResume,
+    downloadFeedback,
+    downloadFeedbackTone,
+    statusMessage,
+    errorMessage,
+    savedAtLabel,
+    aura,
+    setField,
+    toggleEnergy,
+    handleSave,
+    handleReset,
+    handleDownloadResume,
+  } = useResumeBuilderWorkspace();
 
   if (!session) {
     return (
@@ -237,174 +98,6 @@ export function CandidateResumeBuilder({
     );
   }
 
-  const setField = <K extends keyof CandidateResumeDraft>(
-    field: K,
-    value: CandidateResumeDraft[K]
-  ) => {
-    setResume((currentResume) =>
-      currentResume
-        ? {
-            ...currentResume,
-            [field]: value,
-          }
-        : currentResume
-    );
-  };
-
-  const toggleEnergy = (energy: string) => {
-    setResume((currentResume) => {
-      if (!currentResume) {
-        return currentResume;
-      }
-
-      return {
-        ...currentResume,
-        selectedEnergies: currentResume.selectedEnergies.includes(energy)
-          ? currentResume.selectedEnergies.filter((entry) => entry !== energy)
-          : [...currentResume.selectedEnergies, energy],
-      };
-    });
-  };
-
-  const getAuraFromEnergies = () => {
-    return resume.selectedEnergies.map((energy) => ({
-      label: `${energy.charAt(0)}${energy.slice(1).toLowerCase()} aura`,
-      color: energy === "EMPATHETIC" ? "bg-primary" : "bg-secondary",
-    }));
-  };
-
-  const handleSave = async () => {
-    if (!session.phoneNumber) {
-      return;
-    }
-
-    setIsSavingResume(true);
-    setErrorMessage("");
-    setStatusMessage("");
-
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/users/candidate-resume/${encodeURIComponent(session.phoneNumber)}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(buildCandidateResumeRequest(resume)),
-        }
-      );
-
-      const payload = (await response.json().catch(() => null)) as
-        | {
-            resume?: {
-              content?: unknown;
-              updatedAt?: string | null;
-            } | null;
-          }
-        | null;
-
-      if (!response.ok) {
-        throw new Error(getApiErrorMessage(payload, "Failed to save candidate resume."));
-      }
-
-      const nextResume = buildCandidateResumeFromApi(
-        payload?.resume?.content,
-        session,
-        profileSnapshot
-      );
-
-      setResume(nextResume);
-      setInitialResume(nextResume);
-      setLastSavedAt(payload?.resume?.updatedAt ?? new Date().toISOString());
-      setStatusMessage("Resume saved to your account.");
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "Failed to save candidate resume."
-      );
-    } finally {
-      setIsSavingResume(false);
-    }
-  };
-
-  const handleReset = () => {
-    const nextResume = initialResume || buildCandidateResumeSeed(session, profileSnapshot);
-    setResume(nextResume);
-    setStatusMessage("Resume reset to your last loaded version.");
-    setErrorMessage("");
-  };
-
-  const handleDownloadResume = () => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    setIsDownloadingResume(true);
-    setErrorMessage("");
-    setStatusMessage("");
-    setDownloadFeedback("Opening print-ready resume...");
-    setDownloadFeedbackTone("default");
-
-    try {
-      const exportPayload: ResumePrintDocumentProps = {
-        name: resume.fullName,
-        title: resume.preferredRole,
-        location: resume.location,
-        email: resume.email,
-        phone: resume.phone,
-        personalSummary: resume.personalSummary,
-        profileImage: resume.profileImage || undefined,
-        aura: getAuraFromEnergies(),
-        vibe: resume.skills,
-        journey: resume.journey,
-        internships: resume.internships,
-        achievements: resume.achievements,
-        education: resume.education,
-        awards: resume.awards,
-        certifications: resume.certifications,
-        languages: resume.languages,
-        socialLinks: resume.socialLinks,
-        modalities: resume.skills,
-        softSkills: resume.softSkills,
-        hobbies: resume.hobbies,
-        availability: resume.availability,
-        shiftPreference: resume.shiftPreference,
-        references: resume.references,
-      };
-
-      const exportKey = `resume-export-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-      window.localStorage.setItem(exportKey, JSON.stringify(exportPayload));
-
-      const exportUrl = new URL("/dashboard/candidate/profile/resume/export", window.location.origin);
-      exportUrl.searchParams.set("key", exportKey);
-
-      const exportWindow = window.open(exportUrl.toString(), "_blank");
-
-      if (!exportWindow) {
-        window.localStorage.removeItem(exportKey);
-        throw new Error("Allow pop-ups in your browser to open the print-ready resume.");
-      }
-
-      setStatusMessage("Print-ready resume opened. Choose Save as PDF for selectable text.");
-      setDownloadFeedback("Print-ready resume opened in a new tab with selectable text.");
-      setDownloadFeedbackTone("success");
-
-      window.setTimeout(() => {
-        window.localStorage.removeItem(exportKey);
-      }, 10 * 60 * 1000);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "Failed to export resume PDF."
-      );
-      setDownloadFeedback(
-        error instanceof Error ? error.message : "Failed to export resume PDF."
-      );
-      setDownloadFeedbackTone("error");
-    } finally {
-      setIsDownloadingResume(false);
-    }
-  };
-
-  const savedAtLabel = formatSavedAt(lastSavedAt);
   const actionButtonClassName =
     "inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-black uppercase tracking-[0.18em] transition";
 
@@ -585,7 +278,7 @@ export function CandidateResumeBuilder({
               phone={resume.phone}
               personalSummary={resume.personalSummary}
               profileImage={resume.profileImage || undefined}
-              aura={getAuraFromEnergies()}
+              aura={aura}
               vibe={resume.skills}
               journey={resume.journey}
               internships={resume.internships}

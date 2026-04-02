@@ -8,13 +8,13 @@ export function Categories() {
     {
       icon: <Sparkles className="size-10" />,
       label: "Beauty & Skin",
-      detail: "Beauticians, skin therapists, facial experts, beauty advisors",
+      detail: "Makeup artists, beauticians, skin therapists, beauty advisors",
       color: "text-primary",
     },
     {
       icon: <Scissors className="size-10" />,
       label: "Hair & Salon",
-      detail: "Hair stylists, colorists, salon associates, floor leads",
+      detail: "Hair stylists, colorists, salon managers, floor leads",
       color: "text-secondary",
     },
     {

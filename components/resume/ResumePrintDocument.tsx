@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Link2, Mail, MapPin, Phone } from "lucide-react";
 

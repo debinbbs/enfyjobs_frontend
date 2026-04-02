@@ -16,9 +16,6 @@ import {
   Star,
   User,
   Sparkles,
-  MapPin,
-  Mail,
-  Phone,
   Camera,
   Upload,
   Trash2,
@@ -30,6 +27,10 @@ import {
   Calendar,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"
+).replace(/\/$/, "");
 
 interface JourneyItem {
   role: string;
@@ -125,6 +126,25 @@ interface Phase02Props {
   onBack: () => void;
 }
 
+type AiFeedback = {
+  key: string;
+  tone: "error" | "success";
+  message: string;
+};
+
+function getApiErrorMessage(payload: unknown, fallbackMessage: string) {
+  if (!payload || typeof payload !== "object") {
+    return fallbackMessage;
+  }
+
+  const message = (payload as { message?: string | string[] }).message;
+  if (Array.isArray(message)) {
+    return message.join(", ");
+  }
+
+  return typeof message === "string" ? message : fallbackMessage;
+}
+
 export function Phase02Journey({
   fullName, setFullName,
   email, setEmail,
@@ -138,7 +158,6 @@ export function Phase02Journey({
   internships, setInternships,
   achievements, setAchievements,
   education, setEducation,
-  awards, setAwards,
   certifications, setCertifications,
   languages, setLanguages,
   socialLinks, setSocialLinks,
@@ -152,7 +171,8 @@ export function Phase02Journey({
   onBack,
 }: Phase02Props) {
   const [activeSection, setActiveSection] = useState<string>("personal");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatingTarget, setGeneratingTarget] = useState<string | null>(null);
+  const [aiFeedback, setAiFeedback] = useState<AiFeedback | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const toggleSection = (id: string) => {
@@ -170,14 +190,183 @@ export function Phase02Journey({
     }
   };
 
-  const generateAI = () => {
-    setIsGenerating(true);
-    // Simulate AI generation based on preferred role
-    setTimeout(() => {
-      const summary = `Dedicated ${preferredRole} with a passion for excellence in the wellness industry. Committed to delivering exceptional guest experiences and maintaining high professional standards. Eager to leverage my skills in a dynamic hospitality environment to drive impact and growth.`;
-      setPersonalSummary(summary);
-      setIsGenerating(false);
-    }, 1500);
+  const buildSummaryBio = () => {
+    const completedExperience = journey
+      .map((item) => [item.role, item.company, item.description].filter(Boolean).join(" at "))
+      .filter(Boolean);
+    const completedInternships = internships
+      .map((item) => [item.role, item.company, item.description].filter(Boolean).join(" at "))
+      .filter(Boolean);
+
+    return [
+      preferredRole && `Target role: ${preferredRole}.`,
+      experienceLevel && `Experience level: ${experienceLevel}.`,
+      location && `Location: ${location}.`,
+      personalSummary && `Existing draft summary: ${personalSummary}.`,
+      skills.length > 0 && `Technical skills: ${skills.join(", ")}.`,
+      softSkills.length > 0 && `Soft skills: ${softSkills.join(", ")}.`,
+      completedExperience.length > 0 &&
+        `Work experience highlights: ${completedExperience.join("; ")}.`,
+      completedInternships.length > 0 &&
+        `Internship highlights: ${completedInternships.join("; ")}.`,
+      education.length > 0 &&
+        `Education: ${education
+          .map((item) => [item.degree, item.school, item.year].filter(Boolean).join(", "))
+          .filter(Boolean)
+          .join("; ")}.`,
+      certifications.length > 0 &&
+        `Certifications: ${certifications
+          .map((item) => item.title)
+          .filter(Boolean)
+          .join(", ")}.`,
+      achievements.length > 0 &&
+        `Achievements: ${achievements
+          .map((item) => [item.name, item.description].filter(Boolean).join(": "))
+          .filter(Boolean)
+          .join("; ")}.`,
+    ]
+      .filter(Boolean)
+      .join(" ");
+  };
+
+  const requestAiCopy = async ({
+    key,
+    bio,
+    mode,
+    onApply,
+  }: {
+    key: string;
+    bio: string;
+    mode: "summary" | "work_experience" | "internship";
+    onApply: (value: string) => void;
+  }) => {
+    if (generatingTarget) {
+      return;
+    }
+
+    if (bio.trim().length < 10) {
+      setAiFeedback({
+        key,
+        tone: "error",
+        message: "Add a little more detail first so AI has enough context to write from.",
+      });
+      return;
+    }
+
+    setGeneratingTarget(key);
+    setAiFeedback(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/ai/generate-summary`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bio, mode }),
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          getApiErrorMessage(payload, "AI generation failed. Please try again.")
+        );
+      }
+
+      const generatedText =
+        typeof (payload as { summary?: unknown })?.summary === "string"
+          ? (payload as { summary: string }).summary.trim()
+          : "";
+
+      if (!generatedText) {
+        throw new Error("AI returned an empty response. Please try again.");
+      }
+
+      onApply(generatedText);
+      setAiFeedback({
+        key,
+        tone: "success",
+        message: "AI draft added. You can edit it further if needed.",
+      });
+    } catch (error) {
+      setAiFeedback({
+        key,
+        tone: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "AI generation failed. Please try again.",
+      });
+    } finally {
+      setGeneratingTarget(null);
+    }
+  };
+
+  const generateSummary = () => {
+    void requestAiCopy({
+      key: "personal-summary",
+      bio: buildSummaryBio(),
+      mode: "summary",
+      onApply: setPersonalSummary,
+    });
+  };
+
+  const generateJourneyDescription = (index: number) => {
+    const item = journey[index];
+
+    void requestAiCopy({
+      key: `journey-${index}`,
+      bio: [
+        "Work experience section.",
+        preferredRole && `Target role: ${preferredRole}.`,
+        experienceLevel && `Candidate level: ${experienceLevel}.`,
+        item.role && `Role: ${item.role}.`,
+        item.company && `Company: ${item.company}.`,
+        item.duration && `Duration: ${item.duration}.`,
+        item.description
+          ? `User-written description to improve and rewrite: ${item.description}.`
+          : "No user-written description provided. Generate the description from the role, company, duration, and skills.",
+        skills.length > 0 && `Relevant skills: ${skills.join(", ")}.`,
+        softSkills.length > 0 && `Soft skills: ${softSkills.join(", ")}.`,
+      ]
+        .filter(Boolean)
+        .join(" "),
+      mode: "work_experience",
+      onApply: (value) => {
+        const nextJourney = [...journey];
+        nextJourney[index] = { ...nextJourney[index], description: value };
+        setJourney(nextJourney);
+      },
+    });
+  };
+
+  const generateInternshipDescription = (index: number) => {
+    const item = internships[index];
+
+    void requestAiCopy({
+      key: `internship-${index}`,
+      bio: [
+        "Internship section.",
+        preferredRole && `Target role: ${preferredRole}.`,
+        experienceLevel && `Candidate level: ${experienceLevel}.`,
+        item.role && `Internship role: ${item.role}.`,
+        item.company && `Company: ${item.company}.`,
+        item.duration && `Duration: ${item.duration}.`,
+        item.description
+          ? `User-written description to improve and rewrite: ${item.description}.`
+          : "No user-written description provided. Generate the description from the internship role, company, duration, and skills.",
+        skills.length > 0 && `Relevant skills: ${skills.join(", ")}.`,
+        softSkills.length > 0 && `Soft skills: ${softSkills.join(", ")}.`,
+      ]
+        .filter(Boolean)
+        .join(" "),
+      mode: "internship",
+      onApply: (value) => {
+        const nextInternships = [...internships];
+        nextInternships[index] = { ...nextInternships[index], description: value };
+        setInternships(nextInternships);
+      },
+    });
   };
 
   const sections = [
@@ -196,7 +385,7 @@ export function Phase02Journey({
     { id: "social",         label: "Social Links",                   icon: LinkIcon,      color: "text-slate-400 bg-slate-50" },
   ];
 
-  const removeItem = (list: any[], setList: (v: any[]) => void, item: any) => {
+  const removeItem = <T,>(list: T[], setList: (v: T[]) => void, item: T) => {
     setList(list.filter((i) => i !== item));
   };
 
@@ -327,11 +516,11 @@ export function Phase02Journey({
                                 <label className="label-text !m-0 !text-primary">AI Professional Summary</label>
                               </div>
                               <button
-                                onClick={generateAI}
-                                disabled={isGenerating}
+                                onClick={generateSummary}
+                                disabled={generatingTarget !== null}
                                 className="px-6 py-2 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-wider hover:bg-primary-container transition-all shadow-lg shadow-primary/20 disabled:opacity-50 active:scale-95 flex items-center gap-2"
                               >
-                                {isGenerating ? "Synthesizing..." : <><Sparkles className="size-3 fill-white" /> Write with AI</>}
+                                {generatingTarget === "personal-summary" ? "Synthesizing..." : <><Sparkles className="size-3 fill-white" /> Write with AI</>}
                               </button>
                             </div>
                             <textarea
@@ -340,6 +529,18 @@ export function Phase02Journey({
                               value={personalSummary}
                               onChange={(e) => setPersonalSummary(e.target.value)}
                             />
+                            {aiFeedback?.key === "personal-summary" ? (
+                              <p
+                                className={cn(
+                                  "px-2 text-sm font-medium",
+                                  aiFeedback.tone === "error"
+                                    ? "text-rose-600"
+                                    : "text-emerald-600"
+                                )}
+                              >
+                                {aiFeedback.message}
+                              </p>
+                            ) : null}
                           </div>
                         </div>
                       </div>
@@ -468,18 +669,11 @@ export function Phase02Journey({
                                   <div className="flex justify-between items-center px-2 mb-3">
                                     <label className="label-text !m-0">Edit wherever you need to customise it accordingly:</label>
                                     <button
-                                      onClick={() => {
-                                        setIsGenerating(true);
-                                        setTimeout(() => {
-                                          const newJ = [...journey];
-                                          newJ[index].description = `Spearheaded ${item.role ? item.role : 'key initiatives'} driving measurable growth and operational efficiency. Orchestrated cross-functional collaboration to deliver high-impact results, optimizing core workflows and exceeding performance targets.`;
-                                          setJourney(newJ);
-                                          setIsGenerating(false);
-                                        }, 1000);
-                                      }}
+                                      onClick={() => generateJourneyDescription(index)}
+                                      disabled={generatingTarget !== null}
                                       className="flex items-center gap-1.5 text-[10px] font-black uppercase text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full transition-colors"
                                     >
-                                      <Sparkles className="size-3" /> Write with AI
+                                      <Sparkles className="size-3" /> {generatingTarget === `journey-${index}` ? "Writing..." : "Write with AI"}
                                     </button>
                                   </div>
                                   <div className="border border-slate-200 rounded-[10px] bg-white overflow-hidden focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/5 transition-all">
@@ -504,6 +698,18 @@ export function Phase02Journey({
                                       }}
                                     />
                                   </div>
+                                  {aiFeedback?.key === `journey-${index}` ? (
+                                    <p
+                                      className={cn(
+                                        "px-2 text-sm font-medium",
+                                        aiFeedback.tone === "error"
+                                          ? "text-rose-600"
+                                          : "text-emerald-600"
+                                      )}
+                                    >
+                                      {aiFeedback.message}
+                                    </p>
+                                  ) : null}
                                 </div>
                               </div>
                             </div>
@@ -627,18 +833,11 @@ export function Phase02Journey({
                                   <div className="flex justify-between items-center px-2 mb-3">
                                     <label className="label-text !m-0">Edit wherever you need to customise it accordingly:</label>
                                     <button
-                                      onClick={() => {
-                                        setIsGenerating(true);
-                                        setTimeout(() => {
-                                          const newI = [...internships];
-                                          newI[index].description = `Contributed to ${item.role ? item.role : 'key projects'}, gaining hands-on experience in dynamic environments. Assisted senior team members in executing strategic tasks and improving operational workflows.`;
-                                          setInternships(newI);
-                                          setIsGenerating(false);
-                                        }, 1000);
-                                      }}
+                                      onClick={() => generateInternshipDescription(index)}
+                                      disabled={generatingTarget !== null}
                                       className="flex items-center gap-1.5 text-[10px] font-black uppercase text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full transition-colors"
                                     >
-                                      <Sparkles className="size-3" /> Write with AI
+                                      <Sparkles className="size-3" /> {generatingTarget === `internship-${index}` ? "Writing..." : "Write with AI"}
                                     </button>
                                   </div>
                                   <div className="border border-slate-200 rounded-[10px] bg-white overflow-hidden focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/5 transition-all">
@@ -663,6 +862,18 @@ export function Phase02Journey({
                                       }}
                                     />
                                   </div>
+                                  {aiFeedback?.key === `internship-${index}` ? (
+                                    <p
+                                      className={cn(
+                                        "px-2 text-sm font-medium",
+                                        aiFeedback.tone === "error"
+                                          ? "text-rose-600"
+                                          : "text-emerald-600"
+                                      )}
+                                    >
+                                      {aiFeedback.message}
+                                    </p>
+                                  ) : null}
                                 </div>
                               </div>
                             </div>
@@ -786,18 +997,11 @@ export function Phase02Journey({
                                   <div className="flex justify-between items-center px-2 mb-3">
                                     <label className="label-text !m-0">Edit wherever you need to customise it accordingly:</label>
                                     <button
-                                      onClick={() => {
-                                        setIsGenerating(true);
-                                        setTimeout(() => {
-                                          const newI = [...internships];
-                                          newI[index].description = `Contributed to ${item.role ? item.role : 'key projects'}, gaining hands-on experience in dynamic environments. Assisted senior team members in executing strategic tasks and improving operational workflows.`;
-                                          setInternships(newI);
-                                          setIsGenerating(false);
-                                        }, 1000);
-                                      }}
+                                      onClick={() => generateInternshipDescription(index)}
+                                      disabled={generatingTarget !== null}
                                       className="flex items-center gap-1.5 text-[10px] font-black uppercase text-secondary hover:text-black bg-secondary/10 px-3 py-1.5 rounded-full transition-colors"
                                     >
-                                      <Sparkles className="size-3" /> Write with AI
+                                      <Sparkles className="size-3" /> {generatingTarget === `internship-${index}` ? "Writing..." : "Write with AI"}
                                     </button>
                                   </div>
                                   <div className="border border-slate-200 rounded-[10px] bg-white overflow-hidden focus-within:border-secondary/50 focus-within:ring-4 focus-within:ring-secondary/5 transition-all">
@@ -822,6 +1026,18 @@ export function Phase02Journey({
                                       }}
                                     />
                                   </div>
+                                  {aiFeedback?.key === `internship-${index}` ? (
+                                    <p
+                                      className={cn(
+                                        "px-2 text-sm font-medium",
+                                        aiFeedback.tone === "error"
+                                          ? "text-rose-600"
+                                          : "text-emerald-600"
+                                      )}
+                                    >
+                                      {aiFeedback.message}
+                                    </p>
+                                  ) : null}
                                 </div>
                               </div>
                             </div>
@@ -837,6 +1053,116 @@ export function Phase02Journey({
                       </div>
                     )}
 
+
+                    {section.id === "achievements" && (
+                      <div className="space-y-6">
+                        {achievements.map((item, index) => (
+                          <div
+                            key={index}
+                            className="border border-slate-200 rounded-[1.5rem] overflow-hidden bg-white/50 shadow-sm transition-all focus-within:border-emerald-500/30 focus-within:shadow-md focus-within:bg-white"
+                          >
+                            <div className="flex items-center justify-between p-4 px-6 border-b border-slate-100 bg-emerald-50/50">
+                              <div>
+                                <div className="font-bold text-slate-700">
+                                  {item.name || "New Achievement"}
+                                </div>
+                                {item.duration ? (
+                                  <div className="text-[10px] text-slate-400">{item.duration}</div>
+                                ) : null}
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const nextAchievements = [...achievements];
+                                  nextAchievements.splice(index, 1);
+                                  setAchievements(nextAchievements);
+                                }}
+                                className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors flex items-center justify-center shrink-0"
+                              >
+                                <Trash2 className="size-4" />
+                              </button>
+                            </div>
+                            <div className="p-6 md:p-8 space-y-8">
+                              <div className="space-y-2">
+                                <label className="label-text !ml-2">Achievement or Training Name</label>
+                                <input
+                                  className="input-field border-slate-200 border bg-white focus:bg-white"
+                                  placeholder="Best Performer Award / Barista Training"
+                                  value={item.name}
+                                  onChange={(e) => {
+                                    const nextAchievements = [...achievements];
+                                    nextAchievements[index] = {
+                                      ...nextAchievements[index],
+                                      name: e.target.value,
+                                    };
+                                    setAchievements(nextAchievements);
+                                  }}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="label-text !ml-2">Duration or Year</label>
+                                <input
+                                  className="input-field border-slate-200 border bg-white focus:bg-white"
+                                  placeholder="2025 / Jan 2025 - Mar 2025"
+                                  value={item.duration || ""}
+                                  onChange={(e) => {
+                                    const nextAchievements = [...achievements];
+                                    nextAchievements[index] = {
+                                      ...nextAchievements[index],
+                                      duration: e.target.value,
+                                    };
+                                    setAchievements(nextAchievements);
+                                  }}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="label-text !ml-2">Description</label>
+                                <textarea
+                                  className="input-field min-h-[140px] border-slate-200 border bg-white focus:bg-white leading-relaxed"
+                                  placeholder="Describe the achievement, training, certification outcome, or recognition."
+                                  value={item.description}
+                                  onChange={(e) => {
+                                    const nextAchievements = [...achievements];
+                                    nextAchievements[index] = {
+                                      ...nextAchievements[index],
+                                      description: e.target.value,
+                                    };
+                                    setAchievements(nextAchievements);
+                                  }}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="label-text !ml-2">Attachment or Reference Link</label>
+                                <input
+                                  className="input-field border-slate-200 border bg-white focus:bg-white"
+                                  placeholder="https://..."
+                                  value={item.link || ""}
+                                  onChange={(e) => {
+                                    const nextAchievements = [...achievements];
+                                    nextAchievements[index] = {
+                                      ...nextAchievements[index],
+                                      link: e.target.value,
+                                    };
+                                    setAchievements(nextAchievements);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        <button
+                          onClick={() =>
+                            setAchievements([
+                              ...achievements,
+                              { name: "", duration: "", description: "", link: "" },
+                            ])
+                          }
+                          className="text-emerald-600 font-bold text-sm flex items-center gap-2 hover:underline px-2 pt-2"
+                        >
+                          <Plus className="size-4" /> Add new achievement or training
+                        </button>
+                      </div>
+                    )}
 
                     {section.id === "education" && (
                       <div className="space-y-6">
