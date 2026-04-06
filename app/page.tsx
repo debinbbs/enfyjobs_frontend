@@ -17,12 +17,9 @@ export default function Home() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex-1 pt-24 kinetic-mesh min-h-screen"
+      className="flex-1 kinetic-mesh min-h-screen"
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-10">
-        <Hero />
-      </div>
-      <TrustStrip />
+      <Hero />
       <div className="max-w-7xl mx-auto px-6 md:px-10 space-y-32 pb-32">
         <Categories />
         <SwipeShowcase />

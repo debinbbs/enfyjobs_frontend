@@ -10,6 +10,7 @@ import {
 } from "@/lib/auth/candidate-profile";
 import {
   getCandidateAuthHeaders,
+  updateCandidateSessionProfile,
   useCandidateSession,
 } from "@/lib/auth/candidate-session";
 import {
@@ -247,6 +248,13 @@ export function useResumeBuilderWorkspace() {
               content?: unknown;
               updatedAt?: string | null;
             } | null;
+            candidate?: {
+              firstName?: string | null;
+              lastName?: string | null;
+              profileImage?: string | null;
+              email?: string | null;
+              phoneNumber?: string | null;
+            } | null;
           }
         | null;
 
@@ -261,6 +269,17 @@ export function useResumeBuilderWorkspace() {
       );
 
       setResume(nextResume);
+
+      if (payload?.candidate) {
+        updateCandidateSessionProfile({
+          firstName: payload.candidate.firstName ?? undefined,
+          lastName: payload.candidate.lastName ?? undefined,
+          profileImage: payload.candidate.profileImage ?? undefined,
+          email: payload.candidate.email ?? undefined,
+          phoneNumber: payload.candidate.phoneNumber ?? undefined,
+        });
+      }
+
       setLastSavedAt(payload?.resume?.updatedAt ?? new Date().toISOString());
       setStatusMessage("Resume saved to your account.");
     } catch (error) {

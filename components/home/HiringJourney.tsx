@@ -1,11 +1,11 @@
 "use client";
 
-import { BadgeCheck, FileText, MousePointerClick, PartyPopper, SlidersHorizontal } from "lucide-react";
+import { BadgeCheck, FileText, MousePointerClick, PartyPopper, SlidersHorizontal, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function HiringJourney() {
   const steps = [
-    { icon: <FileText className="size-9" />, title: "1. Build your profile", subtitle: "Resume + basics", color: "text-primary border-primary/20" },
+    { icon: <FileText className="size-9" />, title: "1. Build your profile", subtitle: "Build resume in 5 min", color: "text-primary border-primary/20" },
     { icon: <BadgeCheck className="size-9" />, title: "2. Show your strengths", subtitle: "Skills + certifications", color: "text-secondary border-secondary/20" },
     { icon: <MousePointerClick className="size-9" />, title: "3. Swipe and apply", subtitle: "Discover better-fit roles", color: "text-tertiary border-tertiary/20" },
     { icon: <SlidersHorizontal className="size-9" />, title: "4. Prepare with confidence", subtitle: "Interview practice", color: "text-primary border-primary/20" },
@@ -27,18 +27,14 @@ export function HiringJourney() {
       </motion.div>
       
       <div className="relative max-w-6xl mx-auto px-6">
-        {/* Connection Line */}
-        <div className="hidden lg:flex absolute top-12 left-[10%] w-[80%] items-center z-0">
-          <div className="flex-1 h-[2px] bg-gradient-to-r from-primary/20 via-secondary/20 to-secondary/20" />
-          <motion.div 
-            initial={{ opacity: 0, x: -10 }}
-            whileInView={{ opacity: 0.4, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-            className="text-secondary -ml-2"
-          >
-            <ChevronRight className="size-5" />
-          </motion.div>
+        {/* Connection Segments with Arrows */}
+        <div className="hidden lg:grid grid-cols-4 absolute top-12 left-[10%] w-[80%] z-0 h-0.5 items-center">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="relative flex items-center justify-center">
+              <div className="w-full h-[2px] bg-gradient-to-r from-muted-foreground/10 to-muted-foreground/20" />
+              <ChevronRight className="absolute text-secondary size-5 opacity-40" />
+            </div>
+          ))}
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-16 gap-x-8 relative z-10">
           {steps.map((step, i) => (

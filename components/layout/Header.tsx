@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { FileText, LayoutDashboard, LogOut, Search, UserRound } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/ui/logo";
+import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth/AuthModal";
 import Link from "next/link";
 import {
@@ -27,9 +27,11 @@ export function Header() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const showSearch = pathname === "/jobs";
 
+  const isHome = pathname === "/";
+
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -52,51 +54,62 @@ export function Header() {
   return (
     <header className={`
       fixed z-50 flex items-center justify-between whitespace-nowrap
-      transition-[top,inset,border-radius,padding,background-color,border-color,box-shadow,backdrop-filter] duration-700 ease-in-out
-      will-change-[top,inset,border-radius,padding,background-color,border-color,box-shadow,backdrop-filter]
+      transition-all duration-500 ease-in-out
+      will-change-[top,inset,background-color,border-color,box-shadow,backdrop-filter,padding]
       ${scrolled
         ? "top-0 inset-x-0 rounded-none py-4 px-6 md:px-20 bg-surface/80 dark:bg-background/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm"
-        : "top-6 inset-x-6 rounded-[2.5rem] py-4 px-8 md:px-12 bg-surface/40 dark:bg-background/40 backdrop-blur-2xl border border-outline-variant/20 shadow-2xl md:mx-10"
+        : isHome 
+          ? "top-0 inset-x-0 rounded-none py-5 px-10 md:px-20 bg-black/20 backdrop-blur-xl border-transparent shadow-none"
+          : "top-6 inset-x-6 rounded-[2.5rem] py-4 px-8 md:px-12 bg-surface/40 dark:bg-background/40 backdrop-blur-2xl border border-outline-variant/20 shadow-2xl md:mx-10"
       }
     `}>
       <div className="flex items-center gap-12">
         <Link href="/" className="flex items-center gap-3 group cursor-pointer">
-          <Logo size={42} className="transition-transform group-hover:scale-110 duration-500" />
+          <Logo size={42} className={`transition-transform group-hover:scale-110 duration-500 ${isHome && !scrolled ? 'invert brightness-0' : ''}`} />
           <div className="flex flex-col">
-            <span className="text-xl font-black tracking-tight text-foreground leading-none">Wellness Jobs</span>
-            <span className="text-[11px] font-black tracking-[0.25em] uppercase text-primary leading-none mt-1">India</span>
+            <span className={`text-xl font-black tracking-tight leading-none transition-colors duration-500 ${isHome && !scrolled ? 'text-white' : 'text-foreground'}`}>Wellness Jobs</span>
+            <span className={`text-[11px] font-black tracking-[0.25em] uppercase leading-none mt-1 transition-colors duration-500 ${isHome && !scrolled ? 'text-white/70' : 'text-primary'}`}>India</span>
           </div>
         </Link>
         <nav className="hidden lg:flex items-center gap-8">
-          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/jobs">Jobs</Link>
-          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/#categories">Categories</Link>
-          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/#journey">How It Works</Link>
-          <Link className="text-sm font-semibold hover:text-primary transition-colors" href="/#growth">Growth</Link>
+          {[
+            { name: "Jobs", href: "/jobs" },
+            { name: "Categories", href: "/#categories" },
+            { name: "How It Works", href: "/#journey" },
+            { name: "Growth", href: "/#growth" }
+          ].map((item) => (
+            <Link 
+              key={item.name}
+              className={`text-sm font-black uppercase tracking-widest transition-colors duration-500 ${isHome && !scrolled ? 'text-white/70 hover:text-white' : 'text-foreground/70 hover:text-primary'}`} 
+              href={item.href}
+            >
+              {item.name}
+            </Link>
+          ))}
         </nav>
       </div>
       <div className="flex items-center gap-6">
         <div className={`${showSearch ? "hidden md:flex" : "hidden"} items-center relative group`}>
-          <Search className="absolute left-4 text-outline group-focus-within:text-primary transition-colors size-4" />
+          <Search className={`absolute left-4 transition-colors size-4 ${isHome && !scrolled ? 'text-white/60 group-focus-within:text-white' : 'text-outline group-focus-within:text-primary'}`} />
           <Input
-            className="bg-surface-container-high rounded-full py-2.5 pl-11 pr-6 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all border-none ring-offset-background"
+            className={`rounded-full py-2.5 pl-11 pr-6 text-sm w-64 focus:outline-none focus:ring-2 transition-all border-none ring-offset-background ${isHome && !scrolled ? 'bg-white/10 text-white placeholder:text-white/40 focus:ring-white/20' : 'bg-surface-container-high text-foreground placeholder:text-outline/40 focus:ring-primary/20'}`}
             placeholder="Search Careers"
           />
         </div>
-        <ThemeToggle />
         {session ? (
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-3 rounded-full border border-outline-variant/10 bg-surface-container-low px-2 py-2 transition-all hover:bg-surface-container-high">
-              <div className="flex size-9 items-center justify-center rounded-full signature-gradient text-[11px] font-black uppercase tracking-[0.2em] text-on-primary">
-                {profileLabel.slice(0, 1)}
-              </div>
-              <div className="hidden text-left md:block">
-                <p className="text-sm font-black tracking-tight text-foreground">
-                  {profileLabel}
-                </p>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">
-                  {session.phoneNumber || "Signed in"}
-                </p>
-              </div>
+            <DropdownMenuTrigger className={`flex items-center justify-center rounded-lg border-2 overflow-hidden transition-all size-12 ${isHome && !scrolled ? 'bg-white/10 backdrop-blur-md border-white/30 hover:bg-white/20' : 'border-outline-variant/10 bg-surface-container-low hover:bg-surface-container-high shadow-sm'}`}>
+              {session.user?.candidate?.profileImage ? (
+                <img 
+                  src={session.user.candidate.profileImage} 
+                  alt={profileLabel}
+                  className="size-full object-cover"
+                />
+              ) : (
+                <div className="flex size-9 items-center justify-center rounded-lg signature-gradient text-[11px] font-black uppercase tracking-[0.2em] text-on-primary">
+                  {profileLabel.slice(0, 1)}
+                </div>
+              )}
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
@@ -147,7 +160,14 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <AuthModal />
+          <AuthModal>
+            <Button 
+              size="lg" 
+              className={`rounded-lg font-black shadow-xl transition-all hover:scale-105 px-8 h-12 border-2 ${isHome && !scrolled ? 'bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20' : 'signature-gradient border-transparent text-on-primary'}`}
+            >
+              Get Started
+            </Button>
+          </AuthModal>
         )}
       </div>
     </header>

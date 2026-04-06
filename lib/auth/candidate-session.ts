@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 type CandidateProfile = {
   firstName?: string | null;
   lastName?: string | null;
+  profileImage?: string | null;
   isVerified?: boolean | null;
 };
 
@@ -210,6 +211,7 @@ export function clearCandidateSession() {
 export function updateCandidateSessionProfile(details: {
   firstName?: string;
   lastName?: string;
+  profileImage?: string;
   email?: string;
   phoneNumber?: string;
 }) {
@@ -231,6 +233,7 @@ export function updateCandidateSessionProfile(details: {
                 ...currentSession.user.candidate,
                 firstName: details.firstName ?? currentSession.user.candidate.firstName,
                 lastName: details.lastName ?? currentSession.user.candidate.lastName,
+                profileImage: details.profileImage ?? currentSession.user.candidate.profileImage,
               }
             : currentSession.user.candidate,
         }
