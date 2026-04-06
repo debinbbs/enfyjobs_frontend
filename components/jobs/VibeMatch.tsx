@@ -127,7 +127,7 @@ export function VibeMatch() {
                     >
                       <X className="size-7" />
                     </Button>
-                    <Button className="flex-1 h-14 kinetic-gradient text-on-primary rounded-full font-black text-lg shadow-xl border-none">Apply Fast</Button>
+                    <Button variant="outline" className="flex-1 h-14 rounded-full font-black text-sm border-2 border-border/10 hover:bg-muted transition-all uppercase tracking-widest italic">View Details</Button>
                     <Button 
                       variant="outline"
                       onClick={handleNext}

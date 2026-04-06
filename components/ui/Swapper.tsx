@@ -34,6 +34,19 @@ export function Swapper<T>({
 }: SwapperProps<T>) {
   return (
     <div className={`w-full h-full ${className}`}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .mySwiper .swiper-slide {
+          border-radius: 2.5rem !important;
+          overflow: hidden !important;
+          background: transparent !important;
+        }
+        .mySwiper .swiper-slide-shadow,
+        .mySwiper .swiper-slide-shadow-cards,
+        .mySwiper .swiper-slide-shadow-left,
+        .mySwiper .swiper-slide-shadow-right {
+          border-radius: 2.5rem !important;
+        }
+      `}} />
       <Swiper
         effect={effect}
         grabCursor={true}

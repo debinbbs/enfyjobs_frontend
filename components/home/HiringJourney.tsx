@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 export function HiringJourney() {
   const steps = [
-    { icon: <FileText className="size-9" />, title: "1. Build your profile", subtitle: "Build resume in 5 min", color: "text-primary border-primary/20" },
+    { icon: <FileText className="size-9" />, title: "1. Build your profile", subtitle: "Build resume in 60 sec", color: "text-primary border-primary/20" },
     { icon: <BadgeCheck className="size-9" />, title: "2. Show your strengths", subtitle: "Skills + certifications", color: "text-secondary border-secondary/20" },
     { icon: <MousePointerClick className="size-9" />, title: "3. Swipe and apply", subtitle: "Discover better-fit roles", color: "text-tertiary border-tertiary/20" },
     { icon: <SlidersHorizontal className="size-9" />, title: "4. Prepare with confidence", subtitle: "Interview practice", color: "text-primary border-primary/20" },
