@@ -25,7 +25,7 @@ export function Header() {
   const session = useCandidateSession();
   const [scrolled, setScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const showSearch = pathname === "/jobs";
+  const showSearch = ["/", "/jobs"].includes(pathname);
 
   const isHome = pathname === "/";
 
@@ -59,7 +59,7 @@ export function Header() {
       ${scrolled
         ? "top-0 inset-x-0 rounded-none py-4 px-6 md:px-20 bg-surface/80 dark:bg-background/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm"
         : isHome 
-          ? "top-0 inset-x-0 rounded-none py-5 px-10 md:px-20 bg-black/20 backdrop-blur-xl border-transparent shadow-none"
+          ? "top-6 inset-x-6 rounded-[2.5rem] py-4 px-8 md:px-12 bg-black/30 backdrop-blur-2xl border border-white/10 shadow-2xl md:mx-10"
           : "top-6 inset-x-6 rounded-[2.5rem] py-4 px-8 md:px-12 bg-surface/40 dark:bg-background/40 backdrop-blur-2xl border border-outline-variant/20 shadow-2xl md:mx-10"
       }
     `}>
