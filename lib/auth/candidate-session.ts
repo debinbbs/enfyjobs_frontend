@@ -334,6 +334,21 @@ export async function logoutCandidateSession() {
   }
 }
 
+export async function getCandidateAuthHeaders(
+  additionalHeaders: HeadersInit = {}
+): Promise<Record<string, string>> {
+  const session = (await refreshCandidateSession()) || readCandidateSession();
+
+  if (!session?.access_token) {
+    throw new Error("Candidate session is not available.");
+  }
+
+  const nextHeaders = new Headers(additionalHeaders);
+  nextHeaders.set("Authorization", `Bearer ${session.access_token}`);
+
+  return Object.fromEntries(nextHeaders.entries());
+}
+
 function subscribeToCandidateSession(onStoreChange: () => void) {
   if (typeof window === "undefined") {
     return () => undefined;

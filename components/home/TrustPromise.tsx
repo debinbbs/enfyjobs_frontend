@@ -59,7 +59,7 @@ export function TrustPromise() {
               </Badge>
 
               <div className="space-y-5">
-                <h2 className="max-w-3xl text-4xl font-black leading-[1.02] text-foreground md:text-6xl">
+                <h2 className="max-w-3xl text-[42px] font-black leading-[1.02] text-foreground md:text-[55px]">
                   A job search that feels safer, clearer, and fair to candidates.
                 </h2>
                 <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">

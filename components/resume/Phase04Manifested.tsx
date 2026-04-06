@@ -1,16 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Download,
-  Share2,
-  Zap,
-  CheckCircle2,
-  ArrowRight,
-  Globe,
-  Link2
-} from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowLeft, CheckCircle2, Download, Search, Save } from "lucide-react";
 
 interface Phase04Props {
   onBack: () => void;
@@ -21,71 +12,74 @@ interface Phase04Props {
   downloadFeedbackTone?: "default" | "success" | "error";
 }
 
-export function Phase04Manifested({ 
+export function Phase04Manifested({
   onBack,
   onExploreMatches,
   onDownloadResume,
   isDownloadingResume = false,
   downloadFeedback,
-  downloadFeedbackTone = "default"
+  downloadFeedbackTone = "default",
 }: Phase04Props) {
   return (
-    <div className="space-y-12 pb-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
-      {/* Success Hero Section */}
-      <header className="space-y-6">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 border border-secondary/20 rounded-full text-secondary text-[10px] font-black uppercase tracking-widest"
-        >
-          <CheckCircle2 className="size-3.5" />
-          Success State Achieved
-        </motion.div>
-        
-        <div className="space-y-4">
-          <h1 className="text-6xl font-black tracking-tight text-slate-900 leading-[1.1]">
-            Your Prana Profile is <br />
-            <span className="text-primary italic relative">
-              Manifested.
-              <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary/20" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0 5 Q 25 0, 50 5 T 100 5" fill="none" stroke="currentColor" strokeWidth="4" />
-              </svg>
-            </span>
-          </h1>
-          <p className="text-xl text-slate-500 font-medium max-w-xl leading-relaxed">
-            The universe (and our AI) has aligned your career story. Your high-vibe wellness resume is ready for the world.
-          </p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-500">
+      <header className="space-y-4">
+        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-emerald-700">
+          <CheckCircle2 className="size-4" />
+          Step 4
         </div>
+        <h1 className="text-4xl font-black tracking-tight text-slate-900 md:text-5xl">
+          Your profile is ready
+        </h1>
+        <p className="max-w-2xl text-base leading-relaxed text-slate-500">
+          Save your profile, download a clean resume PDF, and start exploring matching jobs.
+        </p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Action Cards */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-[2.5rem] p-10 shadow-xl border border-slate-100 space-y-8 group hover:shadow-2xl transition-all duration-500"
-        >
-          <div className="size-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500">
-            <Download className="size-8" />
+      <div className="grid gap-6 md:grid-cols-2">
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+              <Save className="size-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-900">Save to account</h2>
+              <p className="text-sm text-slate-500">
+                Your data stays searchable for employers and ready for ATS export.
+              </p>
+            </div>
           </div>
-          <div className="space-y-3">
-            <h3 className="text-2xl font-black text-slate-900">Download PDF</h3>
-            <p className="text-sm text-slate-400 font-medium leading-relaxed">
-              High-resolution, ATS-optimized, and aesthetically superior.
-            </p>
+          <p className="text-sm leading-relaxed text-slate-600">
+            Use the save button on the right preview panel any time. You can come back later and edit this profile.
+          </p>
+        </section>
+
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="rounded-2xl bg-secondary/10 p-3 text-secondary">
+              <Download className="size-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-900">Download resume</h2>
+              <p className="text-sm text-slate-500">
+                Get a simple PDF resume you can share with employers.
+              </p>
+            </div>
           </div>
+
           <button
             type="button"
             onClick={onDownloadResume}
             disabled={isDownloadingResume}
-            className="w-full py-5 bg-primary rounded-full text-white font-black uppercase tracking-[0.2em] text-xs shadow-xl transition-all hover:scale-[1.02] active:scale-95"
+            className="inline-flex items-center gap-3 rounded-full bg-secondary px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-white shadow-lg transition hover:scale-[1.02] disabled:opacity-50"
           >
-            {isDownloadingResume ? "Exporting..." : "Export Resume"}
+            <Download className="size-4" />
+            {isDownloadingResume ? "Downloading..." : "Download PDF"}
           </button>
+
           {downloadFeedback ? (
             <p
               className={[
-                "text-xs font-bold leading-relaxed",
+                "mt-4 text-sm font-semibold",
                 downloadFeedbackTone === "error"
                   ? "text-red-600"
                   : downloadFeedbackTone === "success"
@@ -96,84 +90,37 @@ export function Phase04Manifested({
               {downloadFeedback}
             </p>
           ) : null}
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-[2.5rem] p-10 shadow-xl border border-slate-100 space-y-8 group hover:shadow-2xl transition-all duration-500"
-        >
-          <div className="size-16 rounded-2xl bg-secondary/5 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-all duration-500">
-            <Share2 className="size-8" />
-          </div>
-          <div className="space-y-3">
-            <h3 className="text-2xl font-black text-slate-900">Share Vibe</h3>
-            <p className="text-sm text-slate-400 font-medium leading-relaxed">
-              Sync your new profile to LinkedIn or share with your network.
-            </p>
-          </div>
-          <button className="w-full py-5 bg-secondary/10 rounded-full text-secondary font-black uppercase tracking-[0.2em] text-xs transition-all hover:bg-secondary hover:text-white">
-            Post to Feed
-          </button>
-        </motion.div>
+        </section>
       </div>
 
-      {/* Vibe Match Jobs Widget */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-slate-900 rounded-[3rem] p-12 shadow-2xl relative overflow-hidden group"
-      >
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-primary/20 transition-colors duration-1000" />
-        
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-7 space-y-6">
-            <h2 className="text-4xl font-black text-white tracking-tight leading-tight">
-              Apply to Vibe <br /> Match Jobs
-            </h2>
-            <p className="text-slate-400 font-medium leading-relaxed max-w-md">
-              We found <span className="text-primary font-bold">12 Wellness opportunities</span> in Bangalore that align with your new Prana Profile.
+      <section className="rounded-[2rem] border border-slate-200 bg-slate-900 p-6 text-white shadow-xl">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black">See matching jobs</h2>
+            <p className="max-w-xl text-sm leading-relaxed text-white/75">
+              Your category, role, skills, city, and availability are now structured for better search and matching.
             </p>
-            <div className="flex gap-4 pt-4">
-               <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10 text-white text-[10px] font-black uppercase tracking-widest">
-                  <Globe className="size-3 text-primary" /> Remote
-               </div>
-               <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10 text-white text-[10px] font-black uppercase tracking-widest">
-                  <Zap className="size-3 text-secondary" /> High Match
-               </div>
-            </div>
           </div>
-          
-          <div className="lg:col-span-5 flex justify-end">
-            <button 
-              onClick={onExploreMatches}
-              className="group relative px-12 py-6 bg-primary rounded-[2rem] text-white font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all hover:scale-105 active:scale-95"
-            >
-              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-              <span className="relative flex items-center gap-3">
-                Explore Matches
-                <ArrowRight className="size-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onExploreMatches}
+            className="inline-flex items-center gap-3 rounded-full bg-primary px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-white shadow-lg transition hover:scale-[1.02]"
+          >
+            <Search className="size-4" />
+            Explore Jobs
+          </button>
         </div>
-      </motion.div>
+      </section>
 
-      {/* Secondary Actions */}
-      <footer className="pt-8 flex items-center justify-between border-t border-slate-100">
-        <button 
+      <footer className="flex items-center justify-between">
+        <button
+          type="button"
           onClick={onBack}
-          className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 transition-colors"
+          className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-black uppercase tracking-[0.18em] text-slate-500 transition hover:text-slate-900"
         >
-          ← Refine Vibe
+          <ArrowLeft className="size-4" />
+          Back
         </button>
-        <div className="flex gap-8">
-           <button className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 hover:text-primary transition-all">
-             <Link2 className="size-4" /> Copy Magic Link
-           </button>
-        </div>
       </footer>
     </div>
   );

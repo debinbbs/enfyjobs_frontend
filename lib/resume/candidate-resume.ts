@@ -6,18 +6,25 @@ import type { CandidateSession } from "@/lib/auth/candidate-session";
 export type JourneyItem = {
   role: string;
   company: string;
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
   duration: string;
   description: string;
 };
 
 export type CertificationItem = {
   title: string;
+  issuer?: string;
+  issueDate?: string;
+  expiryDate?: string;
   link?: string;
 };
 
 export type EducationItem = {
   school: string;
   degree: string;
+  completionDate: string;
   year: string;
 };
 
@@ -77,6 +84,63 @@ export type CandidateResumeDraft = {
   profZen: boolean;
 };
 
+type StructuredResumeApiPayload = {
+  profile?: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+    summary?: string;
+  } | null;
+  preferences?: {
+    jobCategory?: string;
+    preferredRole?: string;
+    experienceRange?: string;
+    employmentTypePreference?: string;
+    preferredLocations?: string[];
+    joiningAvailability?: string;
+    shiftPreference?: string[];
+  } | null;
+  skills?: string[];
+  softSkills?: string[];
+  languages?: Array<{
+    language?: string;
+    proficiency?: string;
+  }>;
+  certifications?: Array<{
+    certificateName?: string;
+    issuingOrganization?: string | null;
+    issueDate?: string | null;
+    expiryDate?: string | null;
+    verificationUrl?: string | null;
+  }>;
+  education?: Array<{
+    schoolName?: string;
+    degreeName?: string;
+    completionDate?: string | null;
+    completionYear?: string | null;
+  }>;
+  experiences?: Array<{
+    roleTitle?: string;
+    organizationName?: string;
+    startDate?: string;
+    endDate?: string;
+    isCurrent?: boolean;
+    durationLabel?: string;
+    description?: string;
+  }>;
+  internships?: Array<{
+    roleTitle?: string;
+    organizationName?: string;
+    startDate?: string;
+    endDate?: string;
+    isCurrent?: boolean;
+    durationLabel?: string;
+    description?: string;
+  }>;
+  snapshot?: Record<string, unknown> | null;
+} | null;
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -101,6 +165,49 @@ function readStringArray(value: unknown, fallback: string[] = []) {
   return value.filter((entry): entry is string => typeof entry === "string");
 }
 
+function formatMonthLabel(value: string) {
+  if (!value) {
+    return "";
+  }
+
+  if (value.toLowerCase() === "present") {
+    return "Present";
+  }
+
+  const [year, month] = value.split("-");
+  if (!year || !month) {
+    return value;
+  }
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthIndex = Number.parseInt(month, 10) - 1;
+  return monthIndex >= 0 && monthIndex < months.length ? `${months[monthIndex]} ${year}` : value;
+}
+
+export function buildJourneyDurationLabel(
+  startDate: string,
+  endDate: string,
+  isCurrent: boolean,
+  fallback = ""
+) {
+  if (startDate) {
+    const endLabel = isCurrent ? "Present" : endDate;
+    return endLabel
+      ? `${formatMonthLabel(startDate)} - ${formatMonthLabel(endLabel)}`
+      : formatMonthLabel(startDate);
+  }
+
+  return fallback;
+}
+
+export function buildEducationYearLabel(completionDate: string, fallback = "") {
+  if (completionDate) {
+    return formatMonthLabel(completionDate);
+  }
+
+  return fallback;
+}
+
 function readJourneyItems(value: unknown): JourneyItem[] {
   if (!Array.isArray(value)) {
     return [];
@@ -111,7 +218,15 @@ function readJourneyItems(value: unknown): JourneyItem[] {
     .map((entry) => ({
       role: readString(entry.role),
       company: readString(entry.company),
-      duration: readString(entry.duration),
+      startDate: readString(entry.startDate),
+      endDate: readString(entry.endDate),
+      isCurrent: readBoolean(entry.isCurrent),
+      duration: buildJourneyDurationLabel(
+        readString(entry.startDate),
+        readString(entry.endDate),
+        readBoolean(entry.isCurrent),
+        readString(entry.duration)
+      ),
       description: readString(entry.description),
     }));
 }
@@ -141,7 +256,11 @@ function readEducationItems(value: unknown): EducationItem[] {
     .map((entry) => ({
       school: readString(entry.school),
       degree: readString(entry.degree),
-      year: readString(entry.year),
+      completionDate: readString(entry.completionDate),
+      year: buildEducationYearLabel(
+        readString(entry.completionDate),
+        readString(entry.year)
+      ),
     }));
 }
 
@@ -154,6 +273,9 @@ function readCertificationItems(value: unknown): CertificationItem[] {
     .filter(isRecord)
     .map((entry) => ({
       title: readString(entry.title),
+      issuer: readString(entry.issuer),
+      issueDate: readString(entry.issueDate),
+      expiryDate: readString(entry.expiryDate),
       link: readString(entry.link),
     }));
 }
@@ -260,6 +382,133 @@ export function buildCandidateResumeFromApi(
 ): CandidateResumeDraft {
   const seed = buildCandidateResumeSeed(session, profile);
 
+  if (isRecord(payload) && isRecord(payload.structuredResume)) {
+    const structuredResume = payload.structuredResume as StructuredResumeApiPayload;
+    const snapshot = isRecord(structuredResume?.snapshot) ? structuredResume.snapshot : {};
+
+    return {
+      discipline: readString(
+        structuredResume?.preferences?.jobCategory,
+        readString(snapshot.discipline, seed.discipline)
+      ),
+      selectedEnergies: readStringArray(snapshot.selectedEnergies, seed.selectedEnergies),
+      fullName: readString(
+        structuredResume?.profile?.fullName,
+        readString(snapshot.fullName, seed.fullName)
+      ),
+      email: readString(
+        structuredResume?.profile?.email,
+        readString(snapshot.email, seed.email)
+      ),
+      phone: readString(
+        structuredResume?.profile?.phone,
+        readString(snapshot.phone, seed.phone)
+      ),
+      location: readString(
+        structuredResume?.profile?.location,
+        readString(snapshot.location, seed.location)
+      ),
+      experienceLevel: readString(
+        structuredResume?.preferences?.experienceRange,
+        readString(snapshot.experienceLevel, seed.experienceLevel)
+      ),
+      preferredRole: readString(
+        structuredResume?.preferences?.preferredRole,
+        readString(snapshot.preferredRole, seed.preferredRole)
+      ),
+      personalSummary: readString(
+        structuredResume?.profile?.summary,
+        readString(snapshot.personalSummary, seed.personalSummary)
+      ),
+      profileImage: readNullableString(snapshot.profileImage),
+      journey:
+        Array.isArray(structuredResume?.experiences) && structuredResume.experiences.length > 0
+          ? structuredResume.experiences.map((entry) => ({
+              role: readString(entry.roleTitle),
+              company: readString(entry.organizationName),
+              startDate: readString(entry.startDate),
+              endDate: readString(entry.endDate),
+              isCurrent: readBoolean(entry.isCurrent),
+              duration: buildJourneyDurationLabel(
+                readString(entry.startDate),
+                readString(entry.endDate),
+                readBoolean(entry.isCurrent),
+                readString(entry.durationLabel)
+              ),
+              description: readString(entry.description),
+            }))
+          : readJourneyItems(snapshot.journey),
+      internships:
+        Array.isArray(structuredResume?.internships) && structuredResume.internships.length > 0
+          ? structuredResume.internships.map((entry) => ({
+              role: readString(entry.roleTitle),
+              company: readString(entry.organizationName),
+              startDate: readString(entry.startDate),
+              endDate: readString(entry.endDate),
+              isCurrent: readBoolean(entry.isCurrent),
+              duration: buildJourneyDurationLabel(
+                readString(entry.startDate),
+                readString(entry.endDate),
+                readBoolean(entry.isCurrent),
+                readString(entry.durationLabel)
+              ),
+              description: readString(entry.description),
+            }))
+          : readJourneyItems(snapshot.internships),
+      achievements: readAchievementItems(snapshot.achievements),
+      education:
+        Array.isArray(structuredResume?.education) && structuredResume.education.length > 0
+          ? structuredResume.education.map((entry) => ({
+              school: readString(entry.schoolName),
+              degree: readString(entry.degreeName),
+              completionDate: readString(entry.completionDate),
+              year: buildEducationYearLabel(
+                readString(entry.completionDate),
+                readString(entry.completionYear)
+              ),
+            }))
+          : readEducationItems(snapshot.education),
+      awards: readStringArray(snapshot.awards),
+      certifications:
+        Array.isArray(structuredResume?.certifications) &&
+        structuredResume.certifications.length > 0
+          ? structuredResume.certifications.map((entry) => ({
+              title: readString(entry.certificateName),
+              issuer: readString(entry.issuingOrganization),
+              issueDate: readString(entry.issueDate),
+              expiryDate: readString(entry.expiryDate),
+              link: readString(entry.verificationUrl),
+            }))
+          : readCertificationItems(snapshot.certifications),
+      languages:
+        Array.isArray(structuredResume?.languages) && structuredResume.languages.length > 0
+          ? structuredResume.languages.map((entry) => ({
+              language: readString(entry.language),
+              level: readString(entry.proficiency),
+            }))
+          : readLanguageItems(snapshot.languages),
+      socialLinks: readSocialLinks(snapshot.socialLinks),
+      skills: Array.isArray(structuredResume?.skills)
+        ? readStringArray(structuredResume.skills, seed.skills)
+        : readStringArray(snapshot.skills, seed.skills),
+      softSkills: Array.isArray(structuredResume?.softSkills)
+        ? readStringArray(structuredResume.softSkills)
+        : readStringArray(snapshot.softSkills),
+      hobbies: readStringArray(snapshot.hobbies),
+      availability: readString(
+        structuredResume?.preferences?.joiningAvailability,
+        readString(snapshot.availability)
+      ),
+      shiftPreference:
+        Array.isArray(structuredResume?.preferences?.shiftPreference)
+          ? readStringArray(structuredResume.preferences.shiftPreference)
+          : readStringArray(snapshot.shiftPreference),
+      references: readReferenceItems(snapshot.references),
+      highEnergy: readBoolean(snapshot.highEnergy),
+      profZen: readBoolean(snapshot.profZen),
+    };
+  }
+
   if (!isRecord(payload)) {
     return seed;
   }
@@ -295,6 +544,38 @@ export function buildCandidateResumeFromApi(
 }
 
 export function buildCandidateResumeRequest(resume: CandidateResumeDraft) {
+  const journey = resume.journey.filter(
+    (entry) =>
+      entry.role.trim() ||
+      entry.company.trim() ||
+      entry.startDate.trim() ||
+      entry.endDate.trim() ||
+      entry.description.trim()
+  );
+  const internships = resume.internships.filter(
+    (entry) =>
+      entry.role.trim() ||
+      entry.company.trim() ||
+      entry.startDate.trim() ||
+      entry.endDate.trim() ||
+      entry.description.trim()
+  );
+  const education = resume.education.filter(
+    (entry) =>
+      entry.school.trim() ||
+      entry.degree.trim() ||
+      entry.completionDate.trim() ||
+      entry.year.trim()
+  );
+  const certifications = resume.certifications.filter(
+    (entry) =>
+      entry.title.trim() ||
+      (entry.issuer ?? "").trim() ||
+      (entry.issueDate ?? "").trim() ||
+      (entry.expiryDate ?? "").trim() ||
+      (entry.link ?? "").trim()
+  );
+
   return {
     content: {
       discipline: resume.discipline,
@@ -307,12 +588,12 @@ export function buildCandidateResumeRequest(resume: CandidateResumeDraft) {
       preferredRole: resume.preferredRole,
       personalSummary: resume.personalSummary,
       profileImage: resume.profileImage,
-      journey: resume.journey,
-      internships: resume.internships,
+      journey,
+      internships,
       achievements: resume.achievements,
-      education: resume.education,
+      education,
       awards: resume.awards,
-      certifications: resume.certifications,
+      certifications,
       languages: resume.languages,
       socialLinks: resume.socialLinks,
       skills: resume.skills,
@@ -323,6 +604,61 @@ export function buildCandidateResumeRequest(resume: CandidateResumeDraft) {
       references: resume.references,
       highEnergy: resume.highEnergy,
       profZen: resume.profZen,
+    },
+    structured: {
+      profile: {
+        fullName: resume.fullName,
+        email: resume.email,
+        phone: resume.phone,
+        location: resume.location,
+        summary: resume.personalSummary,
+      },
+      preferences: {
+        jobCategory: resume.discipline,
+        preferredRole: resume.preferredRole,
+        experienceRange: resume.experienceLevel,
+        employmentTypePreference: "",
+        preferredLocations: resume.location ? [resume.location] : [],
+        joiningAvailability: resume.availability,
+        shiftPreference: resume.shiftPreference,
+      },
+      skills: resume.skills,
+      softSkills: resume.softSkills,
+      languages: resume.languages.map((entry) => ({
+        language: entry.language,
+        proficiency: entry.level,
+      })),
+      certifications: certifications.map((entry) => ({
+        certificateName: entry.title,
+        issuingOrganization: entry.issuer || null,
+        issueDate: entry.issueDate || null,
+        expiryDate: entry.expiryDate || null,
+        verificationUrl: entry.link || null,
+      })),
+      education: education.map((entry) => ({
+        schoolName: entry.school,
+        degreeName: entry.degree,
+        completionDate: entry.completionDate,
+        completionYear: entry.year,
+      })),
+      experiences: journey.map((entry) => ({
+        roleTitle: entry.role,
+        organizationName: entry.company,
+        startDate: entry.startDate,
+        endDate: entry.endDate,
+        isCurrent: entry.isCurrent,
+        durationLabel: entry.duration,
+        description: entry.description,
+      })),
+      internships: internships.map((entry) => ({
+        roleTitle: entry.role,
+        organizationName: entry.company,
+        startDate: entry.startDate,
+        endDate: entry.endDate,
+        isCurrent: entry.isCurrent,
+        durationLabel: entry.duration,
+        description: entry.description,
+      })),
     },
   };
 }

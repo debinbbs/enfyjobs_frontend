@@ -215,6 +215,10 @@ export function ResumePreview({
   const [scale, setScale] = useState(1);
   const [sidebarPages, setSidebarPages] = useState<string[][]>([[]]);
   const [mainPages, setMainPages] = useState<string[][]>([[]]);
+  const visibleJourney = journey.filter((item) => item.role || item.company || item.duration || item.description);
+  const visibleInternships = internships.filter((item) => item.role || item.company || item.duration || item.description);
+  const visibleEducation = education.filter((item) => item.school || item.degree || item.year);
+  const visibleCertifications = certifications.filter((item) => item.title || item.link);
 
   const contactLabel = socialLinks.linkedin ? formatSocialHandle(socialLinks.linkedin) : "";
 
@@ -298,15 +302,15 @@ export function ResumePreview({
       });
     }
 
-    if (certifications.length > 0) {
-      certifications.forEach((certification, index) => {
+    if (visibleCertifications.length > 0) {
+      visibleCertifications.forEach((certification, index) => {
         blocks.push({
           id: `certifications-${index}`,
           column: "sidebar",
           sectionId: "certifications",
           sectionTitle: "Certifications",
           accent: true,
-          wrapperClassName: index === certifications.length - 1 ? "pb-6" : "pb-3",
+          wrapperClassName: index === visibleCertifications.length - 1 ? "pb-6" : "pb-3",
           content: (
             <div className="border-l border-indigo-500 pl-3 text-[9px] leading-[1.65] text-indigo-200">
               {certification.link ? (
@@ -370,7 +374,7 @@ export function ResumePreview({
     }
 
     return blocks;
-  }, [availability, awards, certifications, hobbies, languages, references, shiftPreference, softSkills, vibe]);
+  }, [availability, awards, hobbies, languages, references, shiftPreference, softSkills, vibe, visibleCertifications]);
 
   const mainBlocks = useMemo(() => {
     const blocks: ResumeBlock[] = [
@@ -388,14 +392,14 @@ export function ResumePreview({
       },
     ];
 
-    if (journey.length > 0) {
-      journey.forEach((item, index) => {
+    if (visibleJourney.length > 0) {
+      visibleJourney.forEach((item, index) => {
         blocks.push({
           id: `journey-${index}`,
           column: "main",
           sectionId: "journey",
           sectionTitle: "Work Experience",
-          wrapperClassName: index === journey.length - 1 ? "pb-6" : "pb-4",
+          wrapperClassName: index === visibleJourney.length - 1 ? "pb-6" : "pb-4",
           content: (
             <div className="space-y-1.5">
               <div className="flex items-start justify-between gap-3">
@@ -418,14 +422,14 @@ export function ResumePreview({
       });
     }
 
-    if (internships.length > 0) {
-      internships.forEach((item, index) => {
+    if (visibleInternships.length > 0) {
+      visibleInternships.forEach((item, index) => {
         blocks.push({
           id: `internships-${index}`,
           column: "main",
           sectionId: "internships",
           sectionTitle: "Internship Experience",
-          wrapperClassName: index === internships.length - 1 ? "pb-6" : "pb-4",
+          wrapperClassName: index === visibleInternships.length - 1 ? "pb-6" : "pb-4",
           content: (
             <div className="space-y-1.5">
               <div className="flex items-start justify-between gap-3">
@@ -475,14 +479,14 @@ export function ResumePreview({
       });
     }
 
-    if (education.length > 0) {
-      education.forEach((item, index) => {
+    if (visibleEducation.length > 0) {
+      visibleEducation.forEach((item, index) => {
         blocks.push({
           id: `education-${index}`,
           column: "main",
           sectionId: "education",
           sectionTitle: "Education",
-          wrapperClassName: index === education.length - 1 ? "pb-6" : "pb-4",
+          wrapperClassName: index === visibleEducation.length - 1 ? "pb-6" : "pb-4",
           content: (
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -499,7 +503,7 @@ export function ResumePreview({
     }
 
     return blocks;
-  }, [achievements, defaultSummary, education, internships, journey, personalSummary]);
+  }, [achievements, defaultSummary, personalSummary, visibleEducation, visibleInternships, visibleJourney]);
 
   const blockMap = useMemo(() => {
     return new Map([...sidebarBlocks, ...mainBlocks].map((block) => [block.id, block]));

@@ -18,7 +18,7 @@ export function Upskilling() {
         <div className="kinetic-blob w-[500px] h-[500px] bg-primary/10 top-0 right-0 blur-[120px]"></div>
         <div className="relative z-10 flex flex-col lg:flex-row gap-20 items-center">
           <div className="flex-1 space-y-10">
-            <h2 className="text-foreground text-5xl md:text-6xl font-black font-display leading-tight">Still building your edge? <br/>Keep growing 💪</h2>
+            <h2 className="text-[42px] md:text-[55px] font-black font-display leading-tight text-foreground">Still building your edge? <br/>Keep growing 💪</h2>
             <p className="text-muted-foreground text-xl leading-relaxed max-w-xl">
               Great roles go to candidates who keep improving. Use WJ India to strengthen your skills, build credibility, and stay ready for better opportunities.
             </p>

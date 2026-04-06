@@ -15,10 +15,10 @@ import { StepIndicator } from "@/components/resume/StepIndicator";
 import { useResumeBuilderWorkspace } from "@/components/resume/useResumeBuilderWorkspace";
 
 const steps = [
-  { id: 1, label: "Set Your Vibe" },
-  { id: 2, label: "Your Journey" },
-  { id: 3, label: "Vibe Check" },
-  { id: 4, label: "Manifested" },
+  { id: 1, label: "Basic Details" },
+  { id: 2, label: "Skills" },
+  { id: 3, label: "Proof" },
+  { id: 4, label: "Ready" },
 ];
 
 type CandidateResumeBuilderProps = {
@@ -49,6 +49,7 @@ export function CandidateResumeBuilder({
     savedAtLabel,
     aura,
     setField,
+    setProfileImage,
     toggleEnergy,
     handleSave,
     handleReset,
@@ -146,69 +147,55 @@ export function CandidateResumeBuilder({
           <div className="lg:col-span-5 pb-20">
             {currentStep === 1 && (
               <Phase01Foundation
+                fullName={resume.fullName}
+                setFullName={(value) => setField("fullName", value)}
+                phone={resume.phone}
+                setPhone={(value) => setField("phone", value)}
+                email={resume.email}
+                setEmail={(value) => setField("email", value)}
+                location={resume.location}
+                setLocation={(value) => setField("location", value)}
                 discipline={resume.discipline}
                 setDiscipline={(value) => setField("discipline", value)}
-                selectedEnergies={resume.selectedEnergies}
-                toggleEnergy={toggleEnergy}
+                preferredRole={resume.preferredRole}
+                setPreferredRole={(value) => setField("preferredRole", value)}
+                profileImage={resume.profileImage}
+                setProfileImage={setProfileImage}
                 onNext={() => setCurrentStep(2)}
               />
             )}
             {currentStep === 2 && (
               <Phase02Journey
-                fullName={resume.fullName}
-                setFullName={(value) => setField("fullName", value)}
-                email={resume.email}
-                setEmail={(value) => setField("email", value)}
-                phone={resume.phone}
-                setPhone={(value) => setField("phone", value)}
+                discipline={resume.discipline}
+                preferredRole={resume.preferredRole}
                 location={resume.location}
-                setLocation={(value) => setField("location", value)}
                 experienceLevel={resume.experienceLevel}
                 setExperienceLevel={(value) => setField("experienceLevel", value)}
-                preferredRole={resume.preferredRole}
-                setPreferredRole={(value) => setField("preferredRole", value)}
                 personalSummary={resume.personalSummary}
                 setPersonalSummary={(value) => setField("personalSummary", value)}
-                profileImage={resume.profileImage}
-                setProfileImage={(value) => setField("profileImage", value)}
-                journey={resume.journey}
-                setJourney={(value) => setField("journey", value)}
-                internships={resume.internships}
-                setInternships={(value) => setField("internships", value)}
-                achievements={resume.achievements}
-                setAchievements={(value) => setField("achievements", value)}
-                education={resume.education}
-                setEducation={(value) => setField("education", value)}
-                awards={resume.awards}
-                setAwards={(value) => setField("awards", value)}
-                certifications={resume.certifications}
-                setCertifications={(value) => setField("certifications", value)}
                 languages={resume.languages}
                 setLanguages={(value) => setField("languages", value)}
-                socialLinks={resume.socialLinks}
-                setSocialLinks={(value) => setField("socialLinks", value)}
                 skills={resume.skills}
                 setSkills={(value) => setField("skills", value)}
-                softSkills={resume.softSkills}
-                setSoftSkills={(value) => setField("softSkills", value)}
-                hobbies={resume.hobbies}
-                setHobbies={(value) => setField("hobbies", value)}
                 availability={resume.availability}
                 setAvailability={(value) => setField("availability", value)}
                 shiftPreference={resume.shiftPreference}
                 setShiftPreference={(value) => setField("shiftPreference", value)}
-                references={resume.references}
-                setReferences={(value) => setField("references", value)}
                 onNext={() => setCurrentStep(3)}
                 onBack={() => setCurrentStep(1)}
               />
             )}
             {currentStep === 3 && (
               <Phase03VibeCheck
-                highEnergy={resume.highEnergy}
-                setHighEnergy={(value) => setField("highEnergy", value)}
-                profZen={resume.profZen}
-                setProfZen={(value) => setField("profZen", value)}
+                journey={resume.journey}
+                setJourney={(value) => setField("journey", value)}
+                internships={resume.internships}
+                setInternships={(value) => setField("internships", value)}
+                certifications={resume.certifications}
+                setCertifications={(value) => setField("certifications", value)}
+                education={resume.education}
+                setEducation={(value) => setField("education", value)}
+                skills={resume.skills}
                 onNext={() => setCurrentStep(4)}
                 onBack={() => setCurrentStep(2)}
               />

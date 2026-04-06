@@ -143,6 +143,10 @@ export function ResumePrintDocument({
   const defaultSummary =
     "Dedicated hospitality professional with a passion for delivering exceptional guest experiences. Committed to maintaining high professional standards in fast-paced hotel, restaurant, and wellness environments.";
   const contactLabel = socialLinks.linkedin ? formatSocialHandle(socialLinks.linkedin) : "";
+  const visibleJourney = journey.filter((item) => item.role || item.company || item.duration || item.description);
+  const visibleInternships = internships.filter((item) => item.role || item.company || item.duration || item.description);
+  const visibleEducation = education.filter((item) => item.school || item.degree || item.year);
+  const visibleCertifications = certifications.filter((item) => item.title || item.link);
 
   return (
     <div
@@ -264,11 +268,11 @@ export function ResumePrintDocument({
             </section>
           ) : null}
 
-          {certifications.length > 0 ? (
+          {visibleCertifications.length > 0 ? (
             <section className="pb-6">
               <PrintSectionHeading light>Certifications</PrintSectionHeading>
               <div className="space-y-3">
-                {certifications.map((item, index) => (
+                {visibleCertifications.map((item, index) => (
                   <p key={`${item.title}-${index}`} className="break-inside-avoid border-l border-[#6366f1] pl-3 text-[9px] leading-[1.65] text-[#e0e7ff]">
                     {item.title}
                   </p>
@@ -315,11 +319,11 @@ export function ResumePrintDocument({
             <p className="text-[12px] leading-[1.75] text-[#475569]">{personalSummary || defaultSummary}</p>
           </section>
 
-          {journey.length > 0 ? (
+          {visibleJourney.length > 0 ? (
             <section className="pb-6">
               <PrintSectionHeading>Work Experience</PrintSectionHeading>
               <div className="space-y-4">
-                {journey.map((item, index) => (
+                {visibleJourney.map((item, index) => (
                   <div key={`${item.role}-${index}`} className="break-inside-avoid space-y-1.5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -339,11 +343,11 @@ export function ResumePrintDocument({
             </section>
           ) : null}
 
-          {internships.length > 0 ? (
+          {visibleInternships.length > 0 ? (
             <section className="pb-6">
               <PrintSectionHeading>Internship Experience</PrintSectionHeading>
               <div className="space-y-4">
-                {internships.map((item, index) => (
+                {visibleInternships.map((item, index) => (
                   <div key={`${item.role}-${index}`} className="break-inside-avoid space-y-1.5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -386,11 +390,11 @@ export function ResumePrintDocument({
             </section>
           ) : null}
 
-          {education.length > 0 ? (
+          {visibleEducation.length > 0 ? (
             <section className="pb-6">
               <PrintSectionHeading>Education</PrintSectionHeading>
               <div className="space-y-4">
-                {education.map((item, index) => (
+                {visibleEducation.map((item, index) => (
                   <div key={`${item.school}-${index}`} className="break-inside-avoid flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[13px] font-black text-[#1e293b]">{item.school}</p>

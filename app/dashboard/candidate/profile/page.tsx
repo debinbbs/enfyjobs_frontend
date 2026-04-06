@@ -15,9 +15,14 @@ import {
   type CandidateProfileDraft,
 } from "@/lib/auth/candidate-profile";
 import {
+  getCandidateAuthHeaders,
   updateCandidateSessionProfile,
   useCandidateSession,
 } from "@/lib/auth/candidate-session";
+import {
+  candidateProfileSchema,
+  getFirstZodErrorMessage,
+} from "@/lib/validation/forms";
 
 const SUGGESTED_SPECIALIZATIONS = [
   "Yoga",
@@ -95,8 +100,12 @@ export default function CandidateProfilePage() {
       setErrorMessage("");
 
       try {
+        const headers = await getCandidateAuthHeaders();
         const response = await fetch(
-          `${API_BASE_URL}/users/candidate-profile/${encodeURIComponent(phoneNumber)}`
+          `${API_BASE_URL}/users/candidate-profile/${encodeURIComponent(phoneNumber)}`,
+          {
+            headers,
+          }
         );
         const payload = (await response.json().catch(() => null)) as unknown;
 
@@ -224,13 +233,19 @@ export default function CandidateProfilePage() {
       setErrorMessage("");
 
       try {
+        const parsedProfile = candidateProfileSchema.safeParse(resolvedProfile);
+        if (!parsedProfile.success) {
+          throw new Error(getFirstZodErrorMessage(parsedProfile.error));
+        }
+
+        const headers = await getCandidateAuthHeaders({
+          "Content-Type": "application/json",
+        });
         const response = await fetch(
           `${API_BASE_URL}/users/candidate-profile/${encodeURIComponent(resolvedProfile.phoneNumber)}`,
           {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers,
             body: JSON.stringify({
               firstName: resolvedProfile.firstName.trim(),
               lastName: resolvedProfile.lastName.trim(),

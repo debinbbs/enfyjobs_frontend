@@ -17,7 +17,9 @@ import { Button } from "@/components/ui/button";
 import { TopSpace } from "@/components/utils/TopSpace";
 import { ResumePreview } from "@/components/resume/ResumePreview";
 import { useResumeBuilderWorkspace } from "@/components/resume/useResumeBuilderWorkspace";
+import { getCandidateAuthHeaders } from "@/lib/auth/candidate-session";
 import type { CandidateResumeDraft } from "@/lib/resume/candidate-resume";
+import { io, type Socket } from "socket.io-client";
 
 const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"
@@ -58,10 +60,10 @@ type GuidedSuggestionsResponse = {
 
 type LiveResumeCommand =
   | {
-      field: "fullName" | "preferredRole" | "location";
-      value: string;
-      response: string;
-    }
+    field: "fullName" | "preferredRole" | "location";
+    value: string;
+    response: string;
+  }
   | null;
 
 type AssistantFlow =
@@ -219,6 +221,36 @@ function uniqueSuggestions(values: Array<string | undefined | null>) {
   );
 }
 
+function shouldUseAiGuidedSuggestions(flow: AssistantFlow) {
+  return (
+    flow === "basics_role" ||
+    flow === "experience_role" ||
+    flow === "summary" ||
+    flow === "skills"
+  );
+}
+
+function shouldAttemptStructuredExtraction(message: string) {
+  const normalizedMessage = message.trim().toLowerCase();
+
+  if (!normalizedMessage) {
+    return false;
+  }
+
+  return (
+    /\b(add|append|include|set|update|change|replace|remove|clear)\b/.test(normalizedMessage) ||
+    /\b(name|email|phone|location|city|role|designation|title|headline|summary|availability|experience level|discipline|skills|soft skills|hobbies|shift preference|linkedin|portfolio|instagram|youtube|twitter)\b/.test(
+      normalizedMessage
+    )
+  );
+}
+
+function isSummaryGenerateIntent(message: string) {
+  return /^(generate|generate with ai|use ai|write it for me|create summary|make summary)$/i.test(
+    message.trim()
+  );
+}
+
 function getResumeSuggestionTrack(resume: CandidateResumeDraft) {
   const explicitDiscipline = resume.discipline.trim().toLowerCase();
   if (explicitDiscipline) {
@@ -369,6 +401,16 @@ export function AiResumeBuilder({
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const guidedSuggestionsCacheRef = useRef(new Map<string, string[]>());
+  const liveSocketRef = useRef<Socket | null>(null);
+  const liveSocketReadyRef = useRef(false);
+
+  // Audio Streaming Refs
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioStreamRef = useRef<MediaStream | null>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
+  const playbackQueueRef = useRef<Float32Array[]>([]);
+  const playbackCtxRef = useRef<AudioContext | null>(null);
+  const nextPlaybackTimeRef = useRef(0);
 
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
@@ -494,30 +536,30 @@ export function AiResumeBuilder({
       patterns: RegExp[];
       response: (value: string) => string;
     }> = [
-      {
-        field: "fullName",
-        patterns: [
-          /^(?:change|update|set)\s+(?:my\s+)?(?:full\s+)?name\s+to\s+(.+)$/i,
-          /^(?:my\s+name\s+is|set\s+name\s+as)\s+(.+)$/i,
-        ],
-        response: (value) => `Done. I updated your name to ${value}.`,
-      },
-      {
-        field: "preferredRole",
-        patterns: [
-          /^(?:change|update|set)\s+(?:my\s+)?(?:role|designation|title|headline)\s+to\s+(.+)$/i,
-        ],
-        response: (value) => `Done. I updated your role to ${value}.`,
-      },
-      {
-        field: "location",
-        patterns: [
-          /^(?:change|update|set)\s+(?:my\s+)?location\s+to\s+(.+)$/i,
-          /^(?:change|update|set)\s+(?:my\s+)?city\s+to\s+(.+)$/i,
-        ],
-        response: (value) => `Done. I updated your location to ${value}.`,
-      },
-    ];
+        {
+          field: "fullName",
+          patterns: [
+            /^(?:change|update|set)\s+(?:my\s+)?(?:full\s+)?name\s+to\s+(.+)$/i,
+            /^(?:my\s+name\s+is|set\s+name\s+as)\s+(.+)$/i,
+          ],
+          response: (value) => `Done. I updated your name to ${value}.`,
+        },
+        {
+          field: "preferredRole",
+          patterns: [
+            /^(?:change|update|set)\s+(?:my\s+)?(?:role|designation|title|headline)\s+to\s+(.+)$/i,
+          ],
+          response: (value) => `Done. I updated your role to ${value}.`,
+        },
+        {
+          field: "location",
+          patterns: [
+            /^(?:change|update|set)\s+(?:my\s+)?location\s+to\s+(.+)$/i,
+            /^(?:change|update|set)\s+(?:my\s+)?city\s+to\s+(.+)$/i,
+          ],
+          response: (value) => `Done. I updated your location to ${value}.`,
+        },
+      ];
 
     for (const command of commandPatterns) {
       for (const pattern of command.patterns) {
@@ -648,11 +690,12 @@ export function AiResumeBuilder({
     bio: string;
     mode: "summary" | "work_experience" | "internship";
   }) => {
+    const headers = await getCandidateAuthHeaders({
+      "Content-Type": "application/json",
+    });
     const response = await fetch(`${API_BASE_URL}/ai/generate-summary`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ bio, mode }),
     });
 
@@ -679,11 +722,12 @@ export function AiResumeBuilder({
       return "";
     }
 
+    const headers = await getCandidateAuthHeaders({
+      "Content-Type": "application/json",
+    });
     const response = await fetch(`${API_BASE_URL}/ai/chat`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         message,
         resumeContext: {
@@ -729,11 +773,12 @@ export function AiResumeBuilder({
     resume: CandidateResumeDraft;
     pendingExperience: { company: string; role: string; duration: string };
   }) => {
+    const headers = await getCandidateAuthHeaders({
+      "Content-Type": "application/json",
+    });
     const response = await fetch(`${API_BASE_URL}/ai/guided-suggestions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         flow,
         resumeContext: {
@@ -764,8 +809,8 @@ export function AiResumeBuilder({
 
     const suggestions = Array.isArray((payload as GuidedSuggestionsResponse | null)?.suggestions)
       ? ((payload as GuidedSuggestionsResponse).suggestions ?? []).filter(
-          (entry): entry is string => typeof entry === "string" && entry.trim().length > 0
-        )
+        (entry): entry is string => typeof entry === "string" && entry.trim().length > 0
+      )
       : [];
 
     return uniqueSuggestions(suggestions).slice(0, 6);
@@ -779,11 +824,12 @@ export function AiResumeBuilder({
       };
     }
 
+    const headers = await getCandidateAuthHeaders({
+      "Content-Type": "application/json",
+    });
     const response = await fetch(`${API_BASE_URL}/ai/extract-resume-updates`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         message,
         resumeContext: {
@@ -815,16 +861,16 @@ export function AiResumeBuilder({
 
     const updates =
       payload &&
-      typeof payload === "object" &&
-      (payload as { updates?: unknown }).updates &&
-      typeof (payload as { updates?: unknown }).updates === "object"
+        typeof payload === "object" &&
+        (payload as { updates?: unknown }).updates &&
+        typeof (payload as { updates?: unknown }).updates === "object"
         ? ((payload as { updates: ResumeFieldUpdates }).updates ?? {})
         : ({} as ResumeFieldUpdates);
 
     const responseMessage =
       payload &&
-      typeof payload === "object" &&
-      typeof (payload as { responseMessage?: unknown }).responseMessage === "string"
+        typeof payload === "object" &&
+        typeof (payload as { responseMessage?: unknown }).responseMessage === "string"
         ? (payload as { responseMessage: string }).responseMessage
         : "Done. I updated your resume details.";
 
@@ -881,7 +927,7 @@ export function AiResumeBuilder({
 
     if (nextFlow === "summary") {
       addAssistantMessage(
-        "Tell me about yourself in your own words. A rough 2 to 5 lines is enough, and I will turn it into a better professional summary."
+        "Tell me about yourself in your own words. A rough 2 to 5 lines is enough, and I will turn it into a better professional summary. If you want me to draft it from your current resume, just type generate."
       );
       return;
     }
@@ -926,6 +972,7 @@ export function AiResumeBuilder({
 
     if (flow === "summary") {
       setAssistantStatus("Improving your summary with AI...");
+      const shouldGenerateFromContext = isSummaryGenerateIntent(trimmedValue);
       try {
         const rewrittenSummary = await runAiRewrite({
           mode: "summary",
@@ -933,7 +980,9 @@ export function AiResumeBuilder({
             resume.preferredRole && `Target role: ${resume.preferredRole}.`,
             resume.experienceLevel && `Experience level: ${resume.experienceLevel}.`,
             resume.location && `Location: ${resume.location}.`,
-            `User-written summary draft: ${trimmedValue}.`,
+            shouldGenerateFromContext
+              ? "No user-written summary draft provided. Generate the summary from the role, experience level, location, and available skills."
+              : `User-written summary draft: ${trimmedValue}.`,
             resume.skills.length > 0 && `Skills: ${resume.skills.join(", ")}.`,
           ]
             .filter(Boolean)
@@ -1008,6 +1057,9 @@ export function AiResumeBuilder({
           {
             company: pendingExperience.company,
             role: pendingExperience.role,
+            startDate: "",
+            endDate: "",
+            isCurrent: false,
             duration: pendingExperience.duration,
             description: experienceDescription,
           },
@@ -1084,14 +1136,28 @@ export function AiResumeBuilder({
       return;
     }
 
-    try {
-      const extractedUpdatePayload = await extractLiveResumeUpdates(nextInput);
-      if (applyResumeFieldUpdates(extractedUpdatePayload.updates)) {
-        addAssistantMessage(extractedUpdatePayload.responseMessage);
+    if (shouldAttemptStructuredExtraction(nextInput)) {
+      try {
+        const extractedUpdatePayload = await extractLiveResumeUpdates(nextInput);
+        if (applyResumeFieldUpdates(extractedUpdatePayload.updates)) {
+          addAssistantMessage(extractedUpdatePayload.responseMessage);
+          return;
+        }
+      } catch {
+        // Fall back to normal live chat if structured extraction fails.
+      }
+    }
+
+    if (chatMode === "live" && liveSocketRef.current) {
+      if (!liveSocketReadyRef.current) {
+        addAssistantMessage("Live AI is still connecting. Please try again in a moment.");
         return;
       }
-    } catch {
-      // Fall back to normal live chat if structured extraction fails.
+
+      setIsChatting(true);
+      setAssistantStatus("Live AI is replying...");
+      liveSocketRef.current.emit("user-text", { text: nextInput });
+      return;
     }
 
     setIsChatting(true);
@@ -1135,7 +1201,16 @@ export function AiResumeBuilder({
     }
 
     if (isListening) {
-      recognitionRef.current?.stop();
+      if (chatMode === "live") {
+        stopAudioStreaming();
+      } else {
+        recognitionRef.current?.stop();
+      }
+      return;
+    }
+
+    if (chatMode === "live") {
+      void startAudioStreaming();
       return;
     }
 
@@ -1174,11 +1249,188 @@ export function AiResumeBuilder({
     recognition.start();
   };
 
+  const startAudioStreaming = async () => {
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
+          sampleRate: 16000,
+        });
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioStreamRef.current = stream;
+
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      const processor = audioContextRef.current.createScriptProcessor(4096, 1, 1);
+      processorRef.current = processor;
+
+      processor.onaudioprocess = (e) => {
+        if (!liveSocketReadyRef.current || !liveSocketRef.current) return;
+
+        const inputData = e.inputBuffer.getChannelData(0);
+        
+        // Interrupt playback if user starts speaking (Basic Barge-in)
+        if (playbackQueueRef.current.length > 0) {
+            playbackQueueRef.current = [];
+            // To truly stop current playback, we'd need to track the active source
+        }
+
+        // Convert Float32 to Int16 PCM
+        const pcmData = new Int16Array(inputData.length);
+        for (let i = 0; i < inputData.length; i++) {
+          pcmData[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7fff;
+        }
+
+        // Send as base64
+        const binary = String.fromCharCode(...new Uint8Array(pcmData.buffer));
+        const base64 = btoa(binary);
+        liveSocketRef.current.emit("user-audio", { audio: base64 });
+      };
+
+      source.connect(processor);
+      processor.connect(audioContextRef.current.destination);
+
+      setIsListening(true);
+      setAssistantStatus("Live Voice Active...");
+    } catch (error) {
+      console.error("Failed to start audio streaming:", error);
+      addAssistantMessage("Could not access microphone for live voice.");
+    }
+  };
+
+  const stopAudioStreaming = () => {
+    processorRef.current?.disconnect();
+    audioStreamRef.current?.getTracks().forEach((track) => track.stop());
+    
+    // Cleanup playback
+    playbackQueueRef.current = [];
+    if (playbackCtxRef.current) {
+        playbackCtxRef.current.close().catch(console.error);
+        playbackCtxRef.current = null;
+    }
+    nextPlaybackTimeRef.current = 0;
+
+    setIsListening(false);
+    setAssistantStatus("");
+  };
+
+  const playQueuedAudio = () => {
+    if (playbackQueueRef.current.length === 0) {
+      return;
+    }
+
+    if (!playbackCtxRef.current) {
+        playbackCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
+            sampleRate: 24000,
+        });
+        nextPlaybackTimeRef.current = playbackCtxRef.current.currentTime;
+    }
+    
+    const ctx = playbackCtxRef.current;
+
+    while (playbackQueueRef.current.length > 0) {
+        const chunk = playbackQueueRef.current.shift()!;
+        const buffer = ctx.createBuffer(1, chunk.length, 24000);
+        buffer.getChannelData(0).set(chunk);
+
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(ctx.destination);
+
+        const startTime = Math.max(ctx.currentTime, nextPlaybackTimeRef.current);
+        source.start(startTime);
+        nextPlaybackTimeRef.current = startTime + buffer.duration;
+    }
+  };
+
+  const handleAudioChunk = (base64Data: string) => {
+    const binary = atob(base64Data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    const pcmData = new Int16Array(bytes.buffer);
+    const floatData = new Float32Array(pcmData.length);
+    for (let i = 0; i < pcmData.length; i++) {
+      floatData[i] = pcmData[i] / 0x7fff;
+    }
+
+    playbackQueueRef.current.push(floatData);
+    playQueuedAudio();
+  };
+
   useEffect(() => {
     if (!isListening && assistantStatus === "Listening...") {
       setAssistantStatus("");
     }
   }, [assistantStatus, isListening]);
+
+  useEffect(() => {
+    if (chatMode !== "live" || !session) {
+      liveSocketReadyRef.current = false;
+      liveSocketRef.current?.disconnect();
+      liveSocketRef.current = null;
+      return;
+    }
+
+    const socket = io(`${API_BASE_URL}/ai-assistant`, {
+      transports: ["websocket"],
+    });
+
+    liveSocketRef.current = socket;
+    setAssistantStatus("Connecting to live AI...");
+
+    socket.on("ai-ready", () => {
+      liveSocketReadyRef.current = true;
+      setAssistantStatus("");
+    });
+
+    socket.on("ai-audio", (base64Audio: string) => {
+       handleAudioChunk(base64Audio);
+    });
+
+    socket.on("ai-transcript-input", (text: string) => {
+       setAssistantStatus(`You: ${text}`);
+    });
+
+    socket.on("ai-transcript-output", (text: string) => {
+       setAssistantStatus(`AI: ${text}`);
+    });
+
+    socket.on("ai-text", (text: string) => {
+      const nextText = text.trim();
+      if (!nextText) {
+        return;
+      }
+
+      addAssistantMessage(nextText);
+      setIsChatting(false);
+      setAssistantStatus("");
+    });
+
+    socket.on("ai-error", (errorMessage: string) => {
+      liveSocketReadyRef.current = false;
+      addAssistantMessage(
+        errorMessage || "Live AI is unavailable right now. Please try again."
+      );
+      setIsChatting(false);
+      setAssistantStatus("");
+    });
+
+    socket.on("disconnect", () => {
+      liveSocketReadyRef.current = false;
+      setIsChatting(false);
+      setAssistantStatus("");
+    });
+
+    return () => {
+      liveSocketReadyRef.current = false;
+      socket.disconnect();
+      if (liveSocketRef.current === socket) {
+        liveSocketRef.current = null;
+      }
+    };
+  }, [chatMode, session]);
 
   useEffect(() => {
     if (!resume || chatMode !== "guided" || flow === "idle") {
@@ -1212,6 +1464,10 @@ export function AiResumeBuilder({
     });
 
     setGuidedSuggestions(fallbackSuggestions);
+
+    if (!shouldUseAiGuidedSuggestions(flow)) {
+      return;
+    }
 
     const cachedSuggestions =
       guidedSuggestionsCacheRef.current.get(suggestionCacheKey) ?? null;
@@ -1350,22 +1606,20 @@ export function AiResumeBuilder({
                     <button
                       type="button"
                       onClick={() => handleChatModeChange("live")}
-                      className={`rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition ${
-                        chatMode === "live"
+                      className={`rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition ${chatMode === "live"
                           ? "bg-primary text-primary-foreground"
                           : "text-slate-600 hover:text-primary"
-                      }`}
+                        }`}
                     >
                       Live Chat
                     </button>
                     <button
                       type="button"
                       onClick={() => handleChatModeChange("guided")}
-                      className={`rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition ${
-                        chatMode === "guided"
+                      className={`rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] transition ${chatMode === "guided"
                           ? "bg-primary text-primary-foreground"
                           : "text-slate-600 hover:text-primary"
-                      }`}
+                        }`}
                     >
                       Guided Mode
                     </button>
@@ -1450,13 +1704,12 @@ export function AiResumeBuilder({
             <div className="border-t border-slate-100 p-5">
               {downloadFeedback ? (
                 <p
-                  className={`mb-3 text-sm font-medium ${
-                    downloadFeedbackTone === "error"
+                  className={`mb-3 text-sm font-medium ${downloadFeedbackTone === "error"
                       ? "text-red-600"
                       : downloadFeedbackTone === "success"
                         ? "text-emerald-600"
                         : "text-slate-500"
-                  }`}
+                    }`}
                 >
                   {downloadFeedback}
                 </p>

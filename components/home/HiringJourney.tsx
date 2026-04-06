@@ -13,7 +13,7 @@ export function HiringJourney() {
 
   return (
     <section className="py-32 text-center" id="journey">
-      <h2 className="text-4xl md:text-5xl font-black font-display mb-6 text-foreground">Your candidate journey, simplified</h2>
+      <h2 className="text-[42px] md:text-[55px] font-black font-display mb-6 text-foreground">Your candidate journey, simplified</h2>
       <p className="mx-auto mb-24 max-w-3xl text-lg leading-relaxed text-muted-foreground">
         Move from confused job hunting to a more guided, modern process built around how wellness professionals actually discover and win opportunities.
       </p>

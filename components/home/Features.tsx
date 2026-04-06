@@ -5,27 +5,27 @@ import { FileText, Sparkles, Target, WandSparkles } from "lucide-react";
 
 export function Features() {
   const features = [
-    { 
-      icon: <FileText className="size-8" />, 
-      title: "Build a resume that gets noticed", 
+    {
+      icon: <FileText className="size-8" />,
+      title: "Build a resume that gets noticed",
       desc: "Turn your skills, certifications, and experience into a cleaner profile that is easier for employers to evaluate.",
       color: "bg-primary text-primary-foreground"
     },
-    { 
-      icon: <Target className="size-8" />, 
-      title: "Practice before the real interview", 
+    {
+      icon: <Target className="size-8" />,
+      title: "Practice before the real interview",
       desc: "Use guided prep to sharpen your responses, improve confidence, and show up more ready when opportunities come in.",
       color: "bg-secondary text-secondary-foreground"
     },
-    { 
-      icon: <Sparkles className="size-8" />, 
-      title: "Discover roles in a way that feels natural", 
+    {
+      icon: <Sparkles className="size-8" />,
+      title: "Discover roles in a way that feels natural",
       desc: "Swipe, save, and explore openings across wellness categories without the friction of a traditional job board.",
       color: "bg-tertiary-container text-on-tertiary"
     },
-    { 
-      icon: <WandSparkles className="size-8" />, 
-      title: "Grow your next move", 
+    {
+      icon: <WandSparkles className="size-8" />,
+      title: "Grow your next move",
       desc: "Improve your profile over time with guided tools, clearer positioning, and candidate support that helps you stay job-ready.",
       color: "bg-tertiary-container text-on-tertiary"
     }
@@ -34,7 +34,7 @@ export function Features() {
   return (
     <section className="py-24">
       <div className="text-center mb-20">
-        <h2 className="text-4xl md:text-5xl font-black font-display mb-6">Everything a wellness candidate needs in one place</h2>
+        <h2 className="text-[42px] md:text-[55px] font-black font-display mb-6">Everything a wellness candidate needs in one place</h2>
         <p className="text-muted-foreground max-w-3xl mx-auto text-lg leading-relaxed">
           Wellnessjobsindia is designed around the candidate journey, from role discovery and resume building to interview preparation and long-term growth.
         </p>

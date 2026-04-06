@@ -56,7 +56,7 @@ export function SwipeShowcase() {
         </div>
       </div>
       <div className="flex-1 order-1 lg:order-2 space-y-10">
-        <h2 className="text-5xl md:text-7xl font-black font-display leading-[1.05] text-foreground">Swipe. Save. <span className="text-secondary">Stand out.</span></h2>
+        <h2 className="text-[42px] md:text-[55px] font-black font-display leading-[1.1] text-foreground">Swipe. Save. <span className="text-secondary">Stand out.</span></h2>
         <p className="text-xl text-muted-foreground leading-relaxed">
           WJ India turns job discovery into something faster and more intuitive. Explore wellness roles with a swipe-first experience that feels built for how candidates already browse and choose.
         </p>

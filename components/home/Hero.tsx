@@ -109,13 +109,13 @@ export function Hero() {
     <section className="relative py-12 md:py-16 overflow-visible">
       <div className="kinetic-blob w-96 h-96 bg-primary-container -top-20 -left-20"></div>
       <div className="kinetic-blob w-80 h-80 bg-secondary-container bottom-0 -right-10"></div>
-      
+
       <div className="flex flex-col lg:flex-row gap-16 items-center">
         <div className="flex-1 space-y-8 z-10">
           <Badge className="w-fit rounded-full bg-secondary/10 text-secondary border border-secondary/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em]">
             Built for wellness candidates
           </Badge>
-          <h1 className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight font-display text-foreground">
+          <h1 className="text-[42px] md:text-[55px] font-black leading-[1.1] font-display text-foreground">
             Find wellness roles that actually fit your energy, skills, and city.
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-2xl leading-relaxed">
@@ -163,7 +163,7 @@ export function Hero() {
                 <CardContent className="p-0 h-full flex flex-col">
                   {/* Photo Area */}
                   <div className="flex-1 relative rounded-[2rem] overflow-hidden shadow-lg group">
-                    <Image 
+                    <Image
                       src={job.image}
                       alt={job.title}
                       fill
@@ -171,7 +171,7 @@ export function Hero() {
                     />
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-                    
+
                     {/* Job Info Overlay */}
                     <div className="absolute bottom-0 left-0 w-full p-8 text-white">
                       <div className="flex flex-col gap-1">
@@ -202,17 +202,17 @@ export function Hero() {
 
                   {/* Actions Area */}
                   <div className="p-6 flex justify-center items-center gap-8 bg-card">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
+                    <Button
+                      variant="outline"
+                      size="icon"
                       onClick={handlePrev}
                       className="size-14 rounded-full border-border/10 text-muted-foreground shadow-sm hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-all bg-surface-container-low"
                     >
                       <X className="size-6" />
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
+                    <Button
+                      variant="outline"
+                      size="icon"
                       onClick={handleNext}
                       className="size-14 rounded-full border-border/10 text-secondary shadow-sm hover:bg-secondary/10 hover:border-secondary/20 transition-all bg-surface-container-low"
                     >

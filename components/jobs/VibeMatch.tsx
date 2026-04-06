@@ -33,6 +33,30 @@ const VIBE_JOBS = [
     type: "On-Site",
     match: 95,
     desc: "Join our elite team to transform lives through integrated fitness and mindfulness programs in our flagship studios."
+  },
+  {
+    id: "v3",
+    title: "Makeup Artist",
+    company: "Looks Salon",
+    location: "Mumbai",
+    badge: "GLAM PICK",
+    image: "/images/home/hero/makeup-artist-facial.png",
+    salary: "₹6L - ₹9L PA",
+    type: "Studio",
+    match: 93,
+    desc: "Bring signature bridal and editorial looks to life for high-profile clients in a fast-moving luxury beauty studio."
+  },
+  {
+    id: "v4",
+    title: "Hair Cut and Styling",
+    company: "Looks Salon",
+    location: "Mumbai",
+    badge: "SALON STAR",
+    image: "/images/home/hero/makeup-artist-photo.png",
+    salary: "₹5L - ₹8L PA",
+    type: "Studio",
+    match: 91,
+    desc: "Create premium cuts, blow-dries, and signature styling finishes for salon clients seeking polished everyday and occasion-ready looks."
   }
 ];
 

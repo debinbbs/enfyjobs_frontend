@@ -14,6 +14,11 @@ import {
   saveCandidateLogin,
   useCandidateSession,
 } from "@/lib/auth/candidate-session";
+import {
+  candidateOtpSchema,
+  candidatePhoneSchema,
+  getFirstZodErrorMessage,
+} from "@/lib/validation/forms";
 
 interface AuthModalProps {
   children?: React.ReactElement;
@@ -149,8 +154,9 @@ export function AuthModal({ children }: AuthModalProps) {
       return;
     }
 
-    if (candidatePhone.replace(/\D/g, "").length !== 10) {
-      setCandidateError("Enter a valid 10-digit mobile number.");
+    const phoneResult = candidatePhoneSchema.safeParse(candidatePhone.replace(/\D/g, ""));
+    if (!phoneResult.success) {
+      setCandidateError(getFirstZodErrorMessage(phoneResult.error));
       return;
     }
 
@@ -186,8 +192,9 @@ export function AuthModal({ children }: AuthModalProps) {
   };
 
   const handleVerifyOtp = async () => {
-    if (candidateOtp.length !== 6) {
-      setCandidateError("Enter the 6-digit OTP.");
+    const otpResult = candidateOtpSchema.safeParse(candidateOtp);
+    if (!otpResult.success) {
+      setCandidateError(getFirstZodErrorMessage(otpResult.error));
       return;
     }
 

@@ -3,8 +3,8 @@ import { CandidateResumeBuilder } from "@/components/resume/CandidateResumeBuild
 export default function CandidateProfileResumeManualPage() {
   return (
     <CandidateResumeBuilder
-      heading="Turn your candidate profile into a polished, reusable resume."
-      description="Bring your experience, certifications, skills, and references together in one builder that saves directly to your account database."
+      heading="Create a simple job profile in a few easy steps."
+      description="Fill only the details employers search most: role, city, experience, skills, and one work proof. We will save it in a structured format and keep your resume ready to share."
       backHref="/dashboard/candidate/profile/resume"
       backLabel="Back To Options"
     />

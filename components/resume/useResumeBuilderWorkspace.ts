@@ -8,13 +8,20 @@ import {
   buildCandidateProfileSeed,
   type CandidateProfileDraft,
 } from "@/lib/auth/candidate-profile";
-import { useCandidateSession } from "@/lib/auth/candidate-session";
+import {
+  getCandidateAuthHeaders,
+  useCandidateSession,
+} from "@/lib/auth/candidate-session";
 import {
   buildCandidateResumeFromApi,
   buildCandidateResumeRequest,
   buildCandidateResumeSeed,
   type CandidateResumeDraft,
 } from "@/lib/resume/candidate-resume";
+import {
+  candidateResumeDraftSchema,
+  getFirstZodErrorMessage,
+} from "@/lib/validation/forms";
 
 const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"
@@ -87,9 +94,14 @@ export function useResumeBuilderWorkspace() {
       const fallbackProfile = buildCandidateProfileSeed(session);
 
       try {
+        const headers = await getCandidateAuthHeaders();
         const [profileResponse, resumeResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/users/candidate-profile/${encodeURIComponent(phoneNumber)}`),
-          fetch(`${API_BASE_URL}/users/candidate-resume/${encodeURIComponent(phoneNumber)}`),
+          fetch(`${API_BASE_URL}/users/candidate-profile/${encodeURIComponent(phoneNumber)}`, {
+            headers,
+          }),
+          fetch(`${API_BASE_URL}/users/candidate-resume/${encodeURIComponent(phoneNumber)}`, {
+            headers,
+          }),
         ]);
 
         const [profilePayload, resumePayload] = await Promise.all([
@@ -105,11 +117,9 @@ export function useResumeBuilderWorkspace() {
           : fallbackProfile;
 
         const nextResume =
-          resumeResponse.ok &&
-          (resumePayload as { resume?: { content?: unknown; updatedAt?: string | null } | null })
-            ?.resume?.content
+          resumeResponse.ok
             ? buildCandidateResumeFromApi(
-                (resumePayload as { resume?: { content?: unknown } | null }).resume?.content,
+                resumePayload,
                 session,
                 nextProfile
               )
@@ -214,13 +224,19 @@ export function useResumeBuilderWorkspace() {
     setStatusMessage("");
 
     try {
+      const parsedResume = candidateResumeDraftSchema.safeParse(resume);
+      if (!parsedResume.success) {
+        throw new Error(getFirstZodErrorMessage(parsedResume.error));
+      }
+
+      const headers = await getCandidateAuthHeaders({
+        "Content-Type": "application/json",
+      });
       const response = await fetch(
         `${API_BASE_URL}/users/candidate-resume/${encodeURIComponent(session.phoneNumber)}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify(buildCandidateResumeRequest(resume)),
         }
       );
@@ -239,7 +255,7 @@ export function useResumeBuilderWorkspace() {
       }
 
       const nextResume = buildCandidateResumeFromApi(
-        payload?.resume?.content,
+        payload,
         session,
         profileSnapshot
       );
@@ -364,6 +380,7 @@ export function useResumeBuilderWorkspace() {
     savedAtLabel: formatSavedAt(lastSavedAt),
     aura,
     setField,
+    setProfileImage: (value: string | null) => setField("profileImage", value),
     toggleEnergy,
     setResume,
     handleSave,

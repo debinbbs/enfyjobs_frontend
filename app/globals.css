@@ -104,8 +104,8 @@
   --color-outline: var(--outline);
   --color-outline-variant: var(--outline-variant);
 
-  --font-sans: var(--font-sans);
-  --font-display: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui;
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-inter), ui-sans-serif, system-ui;
 
   --radius-xs: var(--radius-xs);
   --radius-sm: var(--radius-sm);
@@ -116,8 +116,15 @@
   --animate-gradient: gradient 8s linear infinite;
 
   @keyframes gradient {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
   }
 
   --font-heading: var(--font-sans);
@@ -184,13 +191,18 @@
 }
 
 body {
-  font-family: var(--font-be-vietnam-pro), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   @apply antialiased selection:bg-primary/20 overflow-x-hidden;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-plus-jakarta-sans), sans-serif;
-  @apply font-bold tracking-tight;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-inter), sans-serif;
+  @apply font-bold tracking-normal;
 }
 
 .signature-gradient {
@@ -288,17 +300,21 @@ h1, h2, h3, h4, h5, h6 {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
 }
+
 @layer utilities {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
