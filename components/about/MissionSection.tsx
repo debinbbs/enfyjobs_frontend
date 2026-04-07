@@ -5,13 +5,13 @@ import Image from "next/image";
 import { Scissors, Sparkles, Sprout, HeartPulse, Hotel, Flower2 } from "lucide-react";
 
 export function MissionSection() {
-  const categories = [
-    { title: "Beauty", icon: <Scissors className="size-5" /> },
-    { title: "Salon", icon: <Sparkles className="size-5" /> },
-    { title: "Spa", icon: <Flower2 className="size-5" /> },
-    { title: "Mental Health", icon: <HeartPulse className="size-5" /> },
-    { title: "Yoga", icon: <Sprout className="size-5" /> },
-    { title: "Hotel Industry", icon: <Hotel className="size-5" /> }
+  const values = [
+    { title: "Quality Over Quantity", icon: <Sparkles className="size-5" /> },
+    { title: "Radical Transparency", icon: <Scissors className="size-5" /> },
+    { title: "Empowering Growth", icon: <Sprout className="size-5" /> },
+    { title: "Inclusive Community", icon: <HeartPulse className="size-5" /> },
+    { title: "Global Standards", icon: <Hotel className="size-5" /> },
+    { title: "Inner Balance", icon: <Flower2 className="size-5" /> }
   ];
 
   return (
@@ -30,20 +30,20 @@ export function MissionSection() {
         >
           <div className="space-y-6">
             <h2 className="text-[44px] md:text-[65px] font-black leading-[1] text-foreground tracking-tight">
-              A portal built for the <br />
-              <span className="text-primary italic">Wellness Elite</span>
+              Elevating India's <br />
+              <span className="text-primary italic">Vocational Elite</span>
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-xl font-medium">
-              We bridge the gap between verified employers and the vocational talent that keeps India's wellness industry thriving. 
+              We aren't just another job board. We are systematically organizing the unorganized sector, giving wellness professionals the dignity and visibility they deserve. 
             </p>
           </div>
 
           <div className="space-y-8">
             <p className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground/60 border-l-4 border-primary pl-4">
-              Our Core Categories
+              Our Guiding Principles
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {categories.map((cat, i) => (
+              {values.map((val, i) => (
                 <motion.div 
                   key={i} 
                   initial={{ opacity: 0, y: 10 }}
@@ -52,9 +52,9 @@ export function MissionSection() {
                   className="flex items-center gap-3 text-foreground group"
                 >
                   <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm">
-                    {cat.icon}
+                    {val.icon}
                   </div>
-                  <span className="font-bold text-base tracking-tight">{cat.title}</span>
+                  <span className="font-bold text-base tracking-tight">{val.title}</span>
                 </motion.div>
               ))}
             </div>
@@ -64,7 +64,7 @@ export function MissionSection() {
              <div className="flex gap-4 items-center">
                 <div className="size-1 rounded-full bg-primary" />
                 <p className="text-lg text-foreground font-black italic">
-                   "We don't just find you jobs. We build your career path."
+                   "Stop searching. Start getting discovered."
                 </p>
              </div>
           </div>
@@ -109,8 +109,8 @@ export function MissionSection() {
               transition={{ delay: 0.8 }}
               className="absolute top-1/3 left-0 p-5 rounded-[2rem] bg-white/40 backdrop-blur-3xl border border-white/60 shadow-2xl z-20 max-w-[160px] hidden md:block"
             >
-               <p className="text-primary font-black text-2xl leading-none">5,000+</p>
-               <p className="text-foreground/60 text-[10px] font-bold uppercase tracking-widest mt-1">Hired Candidates</p>
+               <p className="text-primary font-black text-2xl leading-none">10k+</p>
+               <p className="text-foreground/60 text-[10px] font-bold uppercase tracking-widest mt-1">Community Members</p>
             </motion.div>
           </div>
         </motion.div>

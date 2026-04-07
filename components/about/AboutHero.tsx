@@ -37,26 +37,7 @@ export function AboutHero() {
       <div className="relative z-30 max-w-7xl mx-auto px-6 md:px-10 w-full pt-44 pb-36">
         <div className="max-w-3xl space-y-8">
 
-          {/* Label pill */}
-          <motion.div
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-            className="flex items-center gap-3"
-          >
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-xl border border-white/30 px-5 py-2.5 text-white text-xs font-black uppercase tracking-[0.2em]">
-              <Sparkles className="size-3.5 text-amber-300" />
-              Our Story
-            </span>
-            <span className="hidden md:flex items-center gap-1.5 text-white/70 text-sm font-medium">
-              <Star className="size-3.5 text-amber-400 fill-amber-400" />
-              <Star className="size-3.5 text-amber-400 fill-amber-400" />
-              <Star className="size-3.5 text-amber-400 fill-amber-400" />
-              <Star className="size-3.5 text-amber-400 fill-amber-400" />
-              <Star className="size-3.5 text-amber-400 fill-amber-400" />
-              <span className="ml-1">India's most trusted wellness jobs platform</span>
-            </span>
-          </motion.div>
+          {/* Label pill removed per user request */}
 
           {/* Main Headline — ONE color story */}
           <motion.h1
@@ -65,16 +46,16 @@ export function AboutHero() {
             transition={{ delay: 0.3, duration: 0.7 }}
             className="text-[48px] md:text-[76px] font-black leading-[1.0] text-white tracking-tight"
           >
-            We built this for{" "}
+            We built this for your{" "}
             <span className="relative inline-block">
               <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-300 to-pink-300">
-                you.
+                talent.
               </span>
               {/* Underline decoration */}
               <span className="absolute bottom-1 left-0 w-full h-2 bg-gradient-to-r from-amber-400/60 to-pink-400/40 blur-sm rounded-full" />
             </span>
             <br />
-            <span className="text-[#6EE7B7]">Not your certificate.</span>
+            <span className="text-[#6EE7B7]">Not your resume.</span>
           </motion.h1>
 
           {/* Sub-headline */}
@@ -84,36 +65,10 @@ export function AboutHero() {
             transition={{ delay: 0.5, duration: 0.6 }}
             className="text-white/80 text-xl max-w-xl leading-relaxed"
           >
-            India's first wellness jobs platform built exclusively for vocational talent — beauty, spa, yoga, hospitality & more.
+            Instead of applying to hundreds of jobs, create your profile once and let verified wellness employers actively hiring find you.
           </motion.p>
 
-          {/* Floating stat pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65, duration: 0.5 }}
-            className="flex flex-wrap gap-3"
-          >
-            {[
-              { emoji: "🎯", stat: "5,000+", label: "Jobs Filled" },
-              { emoji: "🏢", stat: "200+", label: "Verified Brands" },
-              { emoji: "✅", stat: "₹0", label: "Candidate Fee" },
-            ].map((item, i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.7 + i * 0.1 }}
-                className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl px-5 py-3 text-white"
-              >
-                <span className="text-lg">{item.emoji}</span>
-                <span>
-                  <span className="text-lg font-black block leading-none">{item.stat}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">{item.label}</span>
-                </span>
-              </motion.span>
-            ))}
-          </motion.div>
+          {/* Removed redundant stats block */}
 
           {/* CTA Buttons */}
           <motion.div
@@ -122,37 +77,26 @@ export function AboutHero() {
             transition={{ delay: 0.9, duration: 0.6 }}
             className="flex flex-wrap gap-4 pt-2"
           >
-            <Link
-              href="/jobs"
-              className="inline-flex h-14 items-center gap-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 text-lg font-black text-white shadow-2xl shadow-orange-500/40 transition-all hover:scale-105 active:scale-95 hover:shadow-orange-500/60"
-            >
-              Explore Jobs
-              <ArrowRight className="size-5" />
-            </Link>
             <AuthModal>
               <Button
                 size="lg"
-                className="rounded-2xl bg-white/15 backdrop-blur-xl text-white font-black text-lg border-2 border-white/30 hover:bg-white/25 transition-all px-8 h-14 active:scale-95"
+                className="inline-flex h-14 items-center gap-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 text-lg font-black text-white shadow-2xl shadow-orange-500/40 transition-all hover:scale-105 active:scale-95 hover:shadow-orange-500/60"
               >
-                <Zap className="size-5 mr-2 text-amber-300" />
-                Join Free
+                Create Profile
+                <ArrowRight className="size-5" />
               </Button>
             </AuthModal>
+            <Link
+              href="/jobs"
+              className="inline-flex h-14 items-center rounded-2xl bg-white/15 backdrop-blur-xl text-white font-black text-lg border-2 border-white/30 hover:bg-white/25 transition-all px-8 active:scale-95"
+            >
+              Explore Jobs
+            </Link>
           </motion.div>
         </div>
       </div>
 
-      {/* Floating badge — top right */}
-      <motion.div
-        initial={{ opacity: 0, x: 30, y: -20 }}
-        animate={{ opacity: 1, x: 0, y: 0 }}
-        transition={{ delay: 1.1, duration: 0.7 }}
-        className="absolute top-32 right-10 hidden lg:flex flex-col items-center gap-2 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 text-white z-30"
-      >
-        <span className="text-4xl">🌿</span>
-        <span className="text-xs font-black uppercase tracking-wider text-white/70">Since 2023</span>
-        <span className="text-sm font-bold text-center leading-tight">Changing how<br />India hires wellness</span>
-      </motion.div>
+      {/* Floating badge removed per user request */}
 
       {/* TrustStrip */}
       <div className="absolute bottom-0 left-0 w-full z-40">

@@ -80,7 +80,7 @@ export function AboutIntro() {
               </span>{" "}
               wellness
               <br />
-              jobs platform 🌿
+              careers platform 🌿
             </h2>
           </motion.div>
 

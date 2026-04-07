@@ -70,8 +70,8 @@ export function TechFeatures() {
                     <IterationCcw className="size-5 text-pink-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 font-bold">Apply Mode</p>
-                    <p className="text-sm font-black text-gray-900">Swipe → Apply</p>
+                    <p className="text-xs text-gray-400 font-bold">Matching Mode</p>
+                    <p className="text-sm font-black text-gray-900">Get Discovered</p>
                   </div>
                 </div>
               </motion.div>
@@ -108,17 +108,17 @@ export function TechFeatures() {
           >
             <div className="space-y-5">
               <p className="text-sm font-black uppercase tracking-[0.3em] text-violet-500">
-                Built for Speed
+                Built for Talent
               </p>
               <h2 className="text-[40px] md:text-[58px] font-black leading-[1.05] text-gray-900 tracking-tight">
-                Find your next job in{" "}
+                Get discovered by{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-pink-500">
-                  60 seconds
+                  top brands
                 </span>{" "}
-                flat
+                effortlessly
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
-                No lengthy forms. No confusing portals. EnfyJobs uses AI to build your professional resume and lets you apply to wellness jobs with a simple swipe — as easy as scrolling your feed.
+                No lengthy forms. No confusing portals. EnfyJobs uses AI to build your professional profile and lets verified wellness employers discover your talent directly.
               </p>
             </div>
 
@@ -141,9 +141,9 @@ export function TechFeatures() {
                   <IterationCcw className="size-7" />
                 </div>
                 <div>
-                  <h4 className="text-xl font-black text-gray-900 mb-1">Swipe to Apply</h4>
+                  <h4 className="text-xl font-black text-gray-900 mb-1">Employers Find You</h4>
                   <p className="text-gray-500 leading-relaxed">
-                    Browse jobs like a social feed. Swipe right to apply instantly. No cover letters, no login walls — just you and your next opportunity.
+                    Instead of applying to hundreds of jobs, top wellness brands browse verified profiles and send you interview requests directly. No cover letters, no hassle.
                   </p>
                 </div>
               </div>
@@ -154,7 +154,7 @@ export function TechFeatures() {
               whileHover={{ scale: 1.03 }}
               className="inline-flex items-center gap-2 px-7 py-4 rounded-2xl font-black text-white bg-gradient-to-r from-violet-500 to-pink-500 shadow-lg hover:shadow-violet-200 transition-all text-base"
             >
-              Start Your Job Search <ArrowRight className="size-5" />
+              Create Your Profile <ArrowRight className="size-5" />
             </motion.a>
           </motion.div>
         </div>

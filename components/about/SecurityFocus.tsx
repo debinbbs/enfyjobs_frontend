@@ -40,7 +40,7 @@ export function SecurityFocus() {
                 at every step
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
-                We built WellnessJobsIndia to eliminate the fake listings and "placement fee" scams targeting wellness professionals. Every employer goes through our organisation's strict verification process before reaching you.
+                We built EnfyJobs to eliminate the fake listings and "placement fee" scams targeting wellness professionals. Every employer goes through a strict verification process before discovering your profile.
               </p>
             </div>
 
@@ -64,7 +64,7 @@ export function SecurityFocus() {
             <div className="flex gap-4 p-5 rounded-2xl bg-pink-50 border border-pink-200 max-w-lg">
               <AlertTriangle className="size-6 text-pink-500 shrink-0 mt-0.5" />
               <p className="text-sm text-gray-700 font-semibold leading-snug">
-                If anyone asks for money to get a job on WellnessJobsIndia — <span className="text-pink-600 font-black">report them immediately.</span> We are always 100% free for candidates.
+                If anyone asks for money to get discovered on EnfyJobs — <span className="text-pink-600 font-black">report them immediately.</span> We are always 100% free for candidates.
               </p>
             </div>
 
@@ -73,7 +73,7 @@ export function SecurityFocus() {
               whileHover={{ scale: 1.03 }}
               className="inline-flex items-center gap-2 px-7 py-4 rounded-2xl font-black text-white bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg hover:shadow-pink-200 transition-all text-base"
             >
-              Browse Safe Jobs <ArrowRight className="size-5" />
+              Create Secure Profile <ArrowRight className="size-5" />
             </motion.a>
           </motion.div>
 
@@ -134,8 +134,8 @@ export function SecurityFocus() {
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
                 className="absolute top-1/2 -left-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-4 shadow-xl text-white min-w-[140px]"
               >
-                <p className="text-3xl font-black">5K+</p>
-                <p className="text-xs font-bold opacity-80">Candidates Hired</p>
+                <p className="text-3xl font-black">100%</p>
+                <p className="text-xs font-bold opacity-80">Privacy Assured</p>
               </motion.div>
             </div>
           </motion.div>
