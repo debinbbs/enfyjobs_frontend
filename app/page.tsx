@@ -27,7 +27,11 @@ export default function Home() {
         <HiringJourney />
         <Upskilling />
         <TrustPromise />
+      </div>
+      <div className="w-full">
         <InfiniteMarquee />
+      </div>
+      <div className="max-w-7xl mx-auto px-6 md:px-10 space-y-32 pb-32">
         <Testimonials />
       </div>
     </motion.main>
