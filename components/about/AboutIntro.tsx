@@ -31,7 +31,7 @@ export function AboutIntro() {
     },
     {
       value: "60s",
-      label: "AI Resume Build",
+      label: "Profile Creation",
       icon: <Zap className="size-7" />,
       bg: "from-pink-500 to-rose-600",
       glow: "shadow-pink-400/30",

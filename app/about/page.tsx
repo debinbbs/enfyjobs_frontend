@@ -29,7 +29,7 @@ export default function AboutPage() {
       <SecurityFocus />
 
       {/* Tech Features - Full Width Product Hero */}
-      <div className="mb-32">
+      <div>
         <TechFeatures />
       </div>
 

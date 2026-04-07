@@ -53,8 +53,8 @@ export function TechFeatures() {
                     <Sparkles className="size-5 text-violet-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 font-bold">AI Resume</p>
-                    <p className="text-sm font-black text-gray-900">Ready in 60s ⚡</p>
+                    <p className="text-xs text-gray-400 font-bold">Smart Profile</p>
+                    <p className="text-sm font-black text-gray-900">Created in 60s ⚡</p>
                   </div>
                 </div>
               </motion.div>
@@ -129,9 +129,9 @@ export function TechFeatures() {
                   <Sparkles className="size-7" />
                 </div>
                 <div>
-                  <h4 className="text-xl font-black text-gray-900 mb-1">60-Second AI Resume</h4>
+                  <h4 className="text-xl font-black text-gray-900 mb-1">60-Second Profile Creation</h4>
                   <p className="text-gray-500 leading-relaxed">
-                    Just tell us your skills. Our AI creates a polished, job-ready resume in under a minute — optimized for wellness industry hiring managers.
+                    Just tell us your skills. Our AI creates a polished, job-ready profile in under a minute — optimized so wellness industry hiring managers can find you.
                   </p>
                 </div>
               </div>
