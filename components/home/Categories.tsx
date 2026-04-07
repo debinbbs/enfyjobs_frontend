@@ -66,7 +66,7 @@ export function Categories() {
   } as any;
 
   return (
-    <section className="py-24 px-4 md:px-8 max-w-[1400px] mx-auto" id="categories">
+    <div id="categories" className="w-full">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -143,6 +143,6 @@ export function Categories() {
           </motion.div>
         ))}
       </motion.div>
-    </section>
+    </div>
   );
 }

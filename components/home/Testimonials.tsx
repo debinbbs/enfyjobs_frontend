@@ -23,7 +23,7 @@ export function Testimonials() {
   ];
 
   return (
-    <section className="py-24">
+    <div id="testimonials" className="w-full">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 items-center">
         <motion.div 
           initial={{ opacity: 0, x: -15 }}
@@ -82,6 +82,6 @@ export function Testimonials() {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -33,7 +33,7 @@ export function TrustPromise() {
   ];
 
   return (
-    <section className="py-24" id="trust">
+    <div className="w-full" id="trust">
       <div className="flex flex-col lg:flex-row gap-20 items-center">
         <motion.div 
           initial={{ opacity: 0, x: -15 }}
@@ -75,6 +75,6 @@ export function TrustPromise() {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

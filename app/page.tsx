@@ -10,6 +10,8 @@ import { TrustPromise } from "@/components/home/TrustPromise";
 import { Testimonials } from "@/components/home/Testimonials";
 
 import { motion } from "framer-motion";
+import { Section } from "@/components/home/Section";
+import { SectionFull } from "@/components/home/SectionFull";
 
 export default function Home() {
   return (
@@ -17,23 +19,43 @@ export default function Home() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex-1 kinetic-mesh min-h-screen"
+      className="flex-1 kinetic-mesh min-h-screen flex flex-col"
     >
       <Hero />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-10 space-y-32 pb-32">
+      {/* Categories - Clean Light */}
+      <SectionFull className="bg-white" id="categories">
         <Categories />
-        <SwipeShowcase />
-        <HiringJourney />
-        <Upskilling />
-        <TrustPromise />
-      </div>
-      <div className="w-full">
+      </SectionFull>
+
+      {/* Marquee Break - Full Width Divider */}
+      <div className="w-full bg-white">
         <InfiniteMarquee />
       </div>
-      <div className="max-w-7xl mx-auto px-6 md:px-10 space-y-32 pb-32">
+
+      {/* Swipe Showcase - Dark Forest Premium - Full Width */}
+      <SectionFull className="bg-[#0B4533] relative overflow-hidden group dark" id="showcase">
+        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-transparent pointer-events-none" />
+        <div className="relative z-10">
+          <SwipeShowcase />
+        </div>
+      </SectionFull>
+
+      {/* Hiring Journey - Soft Muted */}
+      <SectionFull className="bg-slate-50/50" id="journey">
+        <HiringJourney />
+      </SectionFull>
+
+      {/* Upskilling & Trust Promise - Clean White */}
+      <SectionFull className="bg-white space-y-32" innerClassName="space-y-32">
+        <Upskilling />
+        <TrustPromise />
+      </SectionFull>
+
+      {/* Testimonials - Soft Background */}
+      <SectionFull className="bg-slate-50">
         <Testimonials />
-      </div>
+      </SectionFull>
     </motion.main>
   );
 }

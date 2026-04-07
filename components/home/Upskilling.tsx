@@ -14,16 +14,9 @@ export function Upskilling() {
   ];
 
   return (
-    <section className="py-24" id="growth">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true, amount: 0.1 }}
-        transition={{ duration: 0.6 }}
-        className="bg-surface-container-low rounded-[4rem] p-10 md:p-20 relative overflow-hidden shadow-2xl border border-outline-variant/10"
-      >
-        <div className="kinetic-blob w-[500px] h-[500px] bg-primary/10 top-0 right-0 blur-[120px]"></div>
-        <div className="relative z-10 flex flex-col lg:flex-row gap-20 items-center">
+    <div className="relative w-full" id="growth">
+      <div className="kinetic-blob w-[500px] h-[500px] bg-primary/10 top-0 right-0 blur-[120px]"></div>
+      <div className="relative z-10 flex flex-col lg:flex-row gap-20 items-center">
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -79,9 +72,8 @@ export function Upskilling() {
                 className="object-cover"
               />
             </motion.div>
-          </motion.div>
-        </div>
-      </motion.div>
-    </section>
+        </motion.div>
+      </div>
+    </div>
   );
 }
