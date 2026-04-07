@@ -15,7 +15,7 @@ export function AboutHero() {
       {/* ── BACKGROUND: vibrant gradient base + photo ── */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/about/main-hero-bg.png"
+          src="/images/about/hero.jpg"
           alt="Wellness Professionals"
           fill
           className="object-cover object-center"
