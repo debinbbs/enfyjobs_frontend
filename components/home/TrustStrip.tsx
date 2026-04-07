@@ -23,7 +23,7 @@ export function TrustStrip() {
     {
       icon: <FileText className="size-5 text-primary" />,
       label: "60 sec",
-      sub: "Resume Building",
+      sub: "Profile Creation",
     },
     {
       icon: <Zap className="size-5 text-secondary" />,
@@ -33,7 +33,7 @@ export function TrustStrip() {
   ];
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1 }}
@@ -42,8 +42,8 @@ export function TrustStrip() {
     >
       <div className="max-w-[1400px] mx-auto px-6 relative z-10 flex flex-wrap justify-between items-center gap-8 lg:gap-4">
         {stats.map((stat, i) => (
-          <motion.div 
-            key={i} 
+          <motion.div
+            key={i}
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}

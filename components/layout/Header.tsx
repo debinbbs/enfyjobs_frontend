@@ -81,9 +81,9 @@ export function Header() {
             { name: "How It Works", href: "/#journey" },
             { name: "Growth", href: "/#growth" }
           ].map((item) => (
-            <Link 
+            <Link
               key={item.name}
-              className={`text-sm font-black uppercase tracking-widest transition-colors duration-500 ${isPhotoHero && !scrolled ? 'text-white/70 hover:text-white' : 'text-foreground/70 hover:text-primary'}`} 
+              className={`text-sm font-black uppercase tracking-widest transition-colors duration-500 ${isPhotoHero && !scrolled ? 'text-white/70 hover:text-white' : 'text-foreground/70 hover:text-primary'}`}
               href={item.href}
             >
               {item.name}
@@ -103,8 +103,8 @@ export function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger className={`flex items-center justify-center rounded-lg border-2 overflow-hidden transition-all size-12 ${isPhotoHero && !scrolled ? 'bg-white/10 backdrop-blur-md border-white/30 hover:bg-white/20' : 'border-outline-variant/10 bg-surface-container-low hover:bg-surface-container-high shadow-sm'}`}>
               {session.user?.candidate?.profileImage ? (
-                <img 
-                  src={session.user.candidate.profileImage} 
+                <img
+                  src={session.user.candidate.profileImage}
                   alt={profileLabel}
                   className="size-full object-cover"
                 />
@@ -164,8 +164,8 @@ export function Header() {
           </DropdownMenu>
         ) : (
           <AuthModal>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className={`rounded-lg font-black shadow-xl transition-all hover:scale-105 px-8 h-12 border-2 ${isPhotoHero && !scrolled ? 'bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20' : 'signature-gradient border-transparent text-on-primary'}`}
             >
               Get Started

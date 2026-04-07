@@ -1,33 +1,33 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Coins, Search, UserCheck } from "lucide-react";
+import { ShieldCheck, Users, BadgeCheck, PhoneOff } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function TrustPromise() {
   const points = [
     {
-      icon: <ShieldCheck className="size-8 text-secondary" />,
-      title: "100% Verified Employers",
-      description: "Every brand on EnfyJobs is manually vetted by our team to ensure they are legitimate wellness businesses.",
+      icon: <Users className="size-8 text-secondary" />,
+      title: "70%+ Wellness pros not on LinkedIn",
+      description: "Many wellness professionals lack an active online presence. We help them get discovered by the right employers.",
       color: "bg-secondary/10"
     },
     {
-      icon: <Coins className="size-8 text-primary" />,
-      title: "Zero Candidate Fees",
-      description: "We never charge candidates for placements. Our platform is and will always be free for wellness talent.",
+      icon: <ShieldCheck className="size-8 text-primary" />,
+      title: "You Control Visibility",
+      description: "Vibe scores and curate your profile. Choose who sees your work and when.",
       color: "bg-primary/10"
     },
     {
-      icon: <Search className="size-8 text-tertiary" />,
-      title: "No Hidden Rounds",
-      description: "Get clear visibility into the hiring process, from first swipe to final offer, with no black holes.",
+      icon: <BadgeCheck className="size-8 text-tertiary" />,
+      title: "Verified Employers Only",
+      description: "Verified means only real, responsible wellness employers hire through our platform.",
       color: "bg-tertiary/10"
     },
     {
-      icon: <UserCheck className="size-8 text-secondary" />,
-      title: "Private & Secure",
-      description: "Your profile is only visible to employers you swipe right on. No public resumes, no unsolicited calls.",
+      icon: <PhoneOff className="size-8 text-secondary" />,
+      title: "No Spam Calls",
+      description: "Verified employer profiles ensure no unsolicited contacts reach your profile.",
       color: "bg-secondary/10"
     }
   ];
@@ -43,15 +43,15 @@ export function TrustPromise() {
           className="flex-1 space-y-8"
         >
           <Badge className="w-fit rounded-full bg-secondary/10 text-secondary border border-secondary/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em]">
-            The EnfyJobs Promise
+            Solving the Wellness Skill Gap
           </Badge>
 
           <div className="space-y-5">
             <h2 className="max-w-3xl text-[42px] font-black leading-[1.02] text-foreground md:text-[55px]">
-              A job search that feels safer, clearer, and fair to candidates.
+              Solving the Wellness Skill Gap in India.
             </h2>
             <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-              We built EnfyJobs to fix the broken wellness hiring market. No more fake listings, no more placement fees, and no more ghosting.
+              Built for the next generation of wellness professionals to dominate their career — without the noise.
             </p>
           </div>
         </motion.div>

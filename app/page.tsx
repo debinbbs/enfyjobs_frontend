@@ -12,6 +12,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { motion } from "framer-motion";
 import { Section } from "@/components/home/Section";
 import { SectionFull } from "@/components/home/SectionFull";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -33,9 +34,17 @@ export default function Home() {
         <InfiniteMarquee />
       </div>
 
-      {/* Swipe Showcase - Dark Forest Premium - Full Width */}
-      <SectionFull className="bg-[#0B4533] relative overflow-hidden group dark" id="showcase">
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-transparent pointer-events-none" />
+      {/* Swipe Showcase - Dark Spa Background - Full Width */}
+      <SectionFull className="relative overflow-hidden group dark" id="showcase">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/all/spa-wellness.jpg"
+            alt="Spa Background"
+            fill
+            className="object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
+        </div>
         <div className="relative z-10">
           <SwipeShowcase />
         </div>

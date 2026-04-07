@@ -1,6 +1,7 @@
 "use client";
 
 import { AboutHero } from "@/components/about/AboutHero";
+import { AboutIntro } from "@/components/about/AboutIntro";
 import { MissionVision } from "@/components/about/MissionVision";
 import { MissionSection } from "@/components/about/MissionSection";
 import { SecurityFocus } from "@/components/about/SecurityFocus";
@@ -18,8 +19,8 @@ export default function AboutPage() {
       {/* Hero Section - Full Width Photographic */}
       <AboutHero />
 
-      {/* Mission & Vision - Brand purpose, stats, and values */}
-      <MissionVision />
+      {/* About Us Intro — Who we are, story, stats */}
+      <AboutIntro />
 
       {/* Mission & Categories - Full Width Split Hero */}
       <MissionSection />

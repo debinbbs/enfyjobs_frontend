@@ -5,88 +5,113 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth/AuthModal";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Star, Zap } from "lucide-react";
 import { TrustStrip } from "@/components/home/TrustStrip";
 
 export function AboutHero() {
-  const tags = ["Beauty & Salon", "Spa & Therapy", "Yoga & Wellness", "Hotel & Hospitality"];
-
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Vibrant Background Photo — lighter overlays to let color shine */}
+
+      {/* ── BACKGROUND: vibrant gradient base + photo ── */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/about/main-hero-bg.png"
-          alt="Happy Wellness Professionals"
+          alt="Wellness Professionals"
           fill
           className="object-cover object-center"
           priority
         />
-        {/* Lighter overlay so the vibrant photo shows through */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B4533]/85 via-[#0B4533]/50 to-transparent z-10" />
-        {/* Subtle top-to-bottom for header clarity */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/30 z-10" />
-        {/* Colorful vibrant tint on the right side */}
-        <div className="absolute inset-0 bg-gradient-to-tl from-violet-600/20 via-pink-500/10 to-transparent z-10" />
+        {/* Warm, vibrant gradient overlay — NOT dark/black */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0B4533]/80 via-[#1a6b4a]/60 to-[#7C3AED]/40 z-10" />
+        {/* Colorful glow spots */}
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#F59E0B]/30 via-[#EC4899]/20 to-transparent z-10" />
+        <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/50 to-transparent z-10" />
       </div>
 
-      {/* CONTENT */}
-      <div className="relative z-30 max-w-7xl mx-auto px-6 md:px-10 w-full pt-40 pb-36">
+      {/* ── Decorative floating orbs ── */}
+      <div className="absolute top-32 right-20 size-64 rounded-full bg-amber-400/20 blur-3xl z-20 pointer-events-none" />
+      <div className="absolute bottom-40 right-40 size-48 rounded-full bg-pink-500/25 blur-3xl z-20 pointer-events-none" />
+      <div className="absolute top-1/2 left-10 size-40 rounded-full bg-emerald-400/20 blur-3xl z-20 pointer-events-none" />
+
+      {/* ── CONTENT ── */}
+      <div className="relative z-30 max-w-7xl mx-auto px-6 md:px-10 w-full pt-44 pb-36">
         <div className="max-w-3xl space-y-8">
 
-          {/* Vibrant badge */}
+          {/* Label pill */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+            className="flex items-center gap-3"
           >
-            <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-500/30 to-pink-500/30 backdrop-blur-md text-white border border-white/30 px-5 py-2.5 text-xs font-black uppercase tracking-[0.2em]">
-              <Sparkles className="size-3.5 text-pink-300" />
-              About WellnessJobsIndia
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-xl border border-white/30 px-5 py-2.5 text-white text-xs font-black uppercase tracking-[0.2em]">
+              <Sparkles className="size-3.5 text-amber-300" />
+              Our Story
+            </span>
+            <span className="hidden md:flex items-center gap-1.5 text-white/70 text-sm font-medium">
+              <Star className="size-3.5 text-amber-400 fill-amber-400" />
+              <Star className="size-3.5 text-amber-400 fill-amber-400" />
+              <Star className="size-3.5 text-amber-400 fill-amber-400" />
+              <Star className="size-3.5 text-amber-400 fill-amber-400" />
+              <Star className="size-3.5 text-amber-400 fill-amber-400" />
+              <span className="ml-1">India's most trusted wellness jobs platform</span>
             </span>
           </motion.div>
 
-          {/* Bold headline with colorful accent */}
+          {/* Main Headline — ONE color story */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-[46px] md:text-[72px] font-black leading-[1.0] text-white tracking-tight"
+            transition={{ delay: 0.3, duration: 0.7 }}
+            className="text-[48px] md:text-[76px] font-black leading-[1.0] text-white tracking-tight"
           >
-            Your Skills,{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-200">
-              Your Future.
+            We built this for{" "}
+            <span className="relative inline-block">
+              <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-300 to-pink-300">
+                you.
+              </span>
+              {/* Underline decoration */}
+              <span className="absolute bottom-1 left-0 w-full h-2 bg-gradient-to-r from-amber-400/60 to-pink-400/40 blur-sm rounded-full" />
             </span>
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-violet-300 to-purple-300 italic">
-              No Degree Required.
-            </span>
+            <span className="text-[#6EE7B7]">Not your certificate.</span>
           </motion.h1>
 
-          {/* Sub-text */}
+          {/* Sub-headline */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            className="text-white/90 text-xl max-w-2xl leading-relaxed font-medium"
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="text-white/80 text-xl max-w-xl leading-relaxed"
           >
-            India's first wellness job portal dedicated to vocational talent. We prioritize your skills over your diploma — connecting you with verified, premium wellness brands.
+            India's first wellness jobs platform built exclusively for vocational talent — beauty, spa, yoga, hospitality & more.
           </motion.p>
 
-          {/* Industry tags */}
+          {/* Floating stat pills */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.75, duration: 0.5 }}
-            className="flex flex-wrap gap-2"
+            transition={{ delay: 0.65, duration: 0.5 }}
+            className="flex flex-wrap gap-3"
           >
-            {tags.map((tag, i) => (
-              <span
+            {[
+              { emoji: "🎯", stat: "5,000+", label: "Jobs Filled" },
+              { emoji: "🏢", stat: "200+", label: "Verified Brands" },
+              { emoji: "✅", stat: "₹0", label: "Candidate Fee" },
+            ].map((item, i) => (
+              <motion.span
                 key={i}
-                className="text-xs font-bold text-white/80 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.7 + i * 0.1 }}
+                className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl px-5 py-3 text-white"
               >
-                {tag}
-              </span>
+                <span className="text-lg">{item.emoji}</span>
+                <span>
+                  <span className="text-lg font-black block leading-none">{item.stat}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">{item.label}</span>
+                </span>
+              </motion.span>
             ))}
           </motion.div>
 
@@ -99,23 +124,35 @@ export function AboutHero() {
           >
             <Link
               href="/jobs"
-              className="inline-flex h-14 items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-500 to-pink-500 px-8 text-lg font-black text-white shadow-2xl shadow-purple-500/30 transition-all hover:scale-105 active:scale-95 hover:shadow-pink-500/40"
+              className="inline-flex h-14 items-center gap-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 text-lg font-black text-white shadow-2xl shadow-orange-500/40 transition-all hover:scale-105 active:scale-95 hover:shadow-orange-500/60"
             >
-              Explore Roles
+              Explore Jobs
               <ArrowRight className="size-5" />
             </Link>
             <AuthModal>
               <Button
                 size="lg"
-                variant="outline"
-                className="rounded-2xl bg-white/10 backdrop-blur-md text-white font-black text-lg border-2 border-white/30 hover:bg-white/20 transition-all px-8 h-14 active:scale-95"
+                className="rounded-2xl bg-white/15 backdrop-blur-xl text-white font-black text-lg border-2 border-white/30 hover:bg-white/25 transition-all px-8 h-14 active:scale-95"
               >
-                Join our Community
+                <Zap className="size-5 mr-2 text-amber-300" />
+                Join Free
               </Button>
             </AuthModal>
           </motion.div>
         </div>
       </div>
+
+      {/* Floating badge — top right */}
+      <motion.div
+        initial={{ opacity: 0, x: 30, y: -20 }}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        transition={{ delay: 1.1, duration: 0.7 }}
+        className="absolute top-32 right-10 hidden lg:flex flex-col items-center gap-2 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 text-white z-30"
+      >
+        <span className="text-4xl">🌿</span>
+        <span className="text-xs font-black uppercase tracking-wider text-white/70">Since 2023</span>
+        <span className="text-sm font-bold text-center leading-tight">Changing how<br />India hires wellness</span>
+      </motion.div>
 
       {/* TrustStrip */}
       <div className="absolute bottom-0 left-0 w-full z-40">

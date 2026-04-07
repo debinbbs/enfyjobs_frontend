@@ -7,34 +7,34 @@ import { motion } from "framer-motion";
 export function Categories() {
   const categories = [
     {
-      image: "/images/all/steptodown.com195727.jpg",
-      label: "Beauty & Skin",
-      detail: "Makeup artists, beauticians, skin therapists, beauty advisors",
-      color: "from-pink-500/20",
-    },
-    {
-      image: "/images/all/steptodown.com239490.jpg",
-      label: "Hair & Salon",
-      detail: "Hair stylists, colorists, salon managers, floor leads",
-      color: "from-amber-500/20",
-    },
-    {
-      image: "/images/all/steptodown.com750516.jpg",
-      label: "Spa & Therapy",
-      detail: "Spa therapists, massage experts, wellness attendants",
-      color: "from-teal-500/20",
-    },
-    {
       image: "/images/all/steptodown.com575388.jpg",
-      label: "Fitness & Yoga",
+      label: "Yoga Instructor",
       detail: "Fitness coaches, yoga instructors, studio trainers",
       color: "from-blue-500/20",
     },
     {
+      image: "/images/all/steptodown.com239490.jpg",
+      label: "Therapist",
+      detail: "Counselors, therapists, support professionals",
+      color: "from-purple-500/20",
+    },
+    {
       image: "/images/all/steptodown.com222353.jpg",
-      label: "Nutrition & Wellness",
+      label: "Nutritionist",
       detail: "Nutritionists, wellness coaches, lifestyle consultants",
       color: "from-emerald-500/20",
+    },
+    {
+      image: "/images/all/steptodown.com750516.jpg",
+      label: "Spa & Salon",
+      detail: "Spa therapists, massage experts, wellness attendants",
+      color: "from-teal-500/20",
+    },
+    {
+      image: "/images/all/steptodown.com195727.jpg",
+      label: "Beauty & Skin",
+      detail: "Makeup artists, beauticians, skin therapists, beauty advisors",
+      color: "from-pink-500/20",
     },
     {
       image: "/images/all/steptodown.com968256.jpg",
@@ -57,9 +57,9 @@ export function Categories() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
+    visible: {
+      opacity: 1,
+      y: 0,
       scale: 1,
       transition: { duration: 0.5, ease: "easeOut" }
     },
@@ -67,7 +67,7 @@ export function Categories() {
 
   return (
     <div id="categories" className="w-full">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
@@ -76,12 +76,11 @@ export function Categories() {
       >
         <div className="max-w-2xl space-y-4">
           <div className="h-1 w-20 bg-primary rounded-full mb-6" />
-          <h2 className="text-[42px] md:text-[55px] font-black font-display text-foreground leading-[1.1] uppercase italic">
-            Career paths <br />
-            <span className="text-primary not-italic">that actually GROW</span>
+          <h2 className="text-[42px] md:text-[55px] font-black font-display text-foreground leading-[1.1]">
+            Explore wellness career paths.
           </h2>
           <p className="text-muted-foreground text-lg md:text-xl font-medium max-w-lg">
-            Discover where your specialized talent fits best across the top wellness categories.
+            Yoga, therapy, nutrition &amp; more &mdash; or get matched based on <span className="text-primary font-bold">your</span> profile.
           </p>
         </div>
         <a href="/jobs" className="group inline-flex items-center gap-3 text-lg font-bold text-primary hover:text-foreground transition-all duration-300">
@@ -89,7 +88,7 @@ export function Categories() {
         </a>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
