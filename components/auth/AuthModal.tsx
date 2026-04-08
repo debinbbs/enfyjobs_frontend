@@ -181,8 +181,15 @@ export function AuthModal({ children }: AuthModalProps) {
       }
 
       setCandidateStep("otp");
-      setCandidateOtp("");
-      setCandidateMessage(`OTP sent to ${candidatePhoneNumber}.`);
+      
+      // Development mock: auto-fill OTP
+      if (process.env.NODE_ENV !== "production") {
+        setCandidateOtp("123456");
+        setCandidateMessage(`[DEV] OTP bypassed. Click Verify to continue.`);
+      } else {
+        setCandidateOtp("");
+        setCandidateMessage(`OTP sent to ${candidatePhoneNumber}.`);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to send OTP.";
       setCandidateError(message);
