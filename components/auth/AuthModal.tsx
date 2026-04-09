@@ -1,6 +1,7 @@
 "use client";
 
 import { cloneElement, type MouseEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -412,7 +413,7 @@ export function AuthModal({ children }: AuthModalProps) {
                 </div>
 
                 <p className="text-center text-[10px] text-outline font-black uppercase tracking-[0.1em] px-8 leading-relaxed opacity-60">
-                  By signing up, you agree to our <a href="#" className="text-primary hover:underline">Terms of Service</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>.
+                  By signing up, you agree to our <Link href="/terms-of-service" className="text-primary hover:underline">Terms of Service</Link> and <Link href="/privacy-policy" className="text-primary hover:underline">Privacy Policy</Link>.
                 </p>
               </TabsContent>
 
