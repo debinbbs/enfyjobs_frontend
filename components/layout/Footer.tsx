@@ -66,8 +66,8 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6 md:px-10 mt-20 pt-10 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-6 text-sm text-zinc-500 font-bold">
         <p>© 2026 Wellnessjobsindia. All Rights Reserved.</p>
         <div className="flex gap-10">
-          <Link href="/" className="hover:text-white transition-colors">Privacy Policy</Link>
-          <Link href="/" className="hover:text-white transition-colors">Terms of Service</Link>
+          <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+          <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
         </div>
       </div>
     </footer>
