@@ -13,40 +13,67 @@ const API_BASE_URL = (
 
 const JOB_GROUPS = [
   {
-    id: "movement",
-    label: "Yoga & Fitness",
-    emoji: "🧘",
-    roles: ["Yoga Instructor", "Pilates Instructor", "Personal Trainer", "Fitness Trainer", "Zumba Instructor", "Dance Instructor"],
+    id: "salon-spa-services",
+    label: "Salon & Spa Services",
+    description: "Create confidence through care.",
+    emoji: "💇",
+    roles: ["Hair Stylist", "Barber", "Beautician", "Nail Technician", "Massage Therapist", "Spa Manager"],
   },
   {
-    id: "nutrition",
-    label: "Nutrition",
-    emoji: "🥗",
-    roles: ["Dietitian", "Nutritionist", "Wellness Coach"],
-  },
-  {
-    id: "bodywork",
-    label: "Spa and salon",
-    emoji: "💆",
-    roles: ["Spa Therapist", "Massage Therapist", "Ayurveda Practitioner", "Physiotherapist"],
+    id: "wellness-hospitality",
+    label: "Wellness Hospitality",
+    description: "Deliver comfort & experiences.",
+    emoji: "🛎️",
+    roles: [
+      "Spa Receptionist",
+      "Front Desk Executive",
+      "Guest Relations Executive",
+      "Resort Activity Coordinator",
+      "Wellness Center Staff",
+      "Housekeeping (Wellness/Resort)",
+    ],
   },
   {
     id: "beauty",
     label: "Beauty & Skin",
+    description: "Enhance beauty with expertise.",
     emoji: "✨",
-    roles: ["Beautician", "Makeup Artist", "Skin Therapist"],
+    roles: ["Skincare Specialist", "Cosmetologist", "Aesthetician", "Laser Technician", "Dermatology Assistant", "Makeup Artist"],
   },
   {
-    id: "mental",
-    label: "Mental Wellness",
+    id: "movement",
+    label: "Yoga & Fitness",
+    description: "Train bodies. Build discipline.",
+    emoji: "🧘",
+    roles: [
+      "Yoga Instructor",
+      "Personal Trainer",
+      "Gym Trainer",
+      "Pilates Instructor",
+      "Zumba / Dance Fitness Coach",
+      "Sports Coach",
+    ],
+  },
+  {
+    id: "therapy-rehabilitation",
+    label: "Therapy & Rehabilitation",
+    description: "Restore movement. Improve lives.",
+    emoji: "🩺",
+    roles: [
+      "Physiotherapist",
+      "Occupational Therapist",
+      "Speech Therapist",
+      "Chiropractor",
+      "Ayurveda Therapist",
+      "Home Care Therapist",
+    ],
+  },
+  {
+    id: "mental-health-coaching",
+    label: "Mental Health & Coaching",
+    description: "Support minds. Change lives.",
     emoji: "🧠",
-    roles: ["Mental Health Counselor", "Life Coach", "Meditation Coach"],
-  },
-  {
-    id: "support",
-    label: "Support & Ops",
-    emoji: "🏢",
-    roles: ["Receptionist", "Manager", "Other"],
+    roles: ["Psychologist", "Counselor", "Therapist", "Life Coach", "Relationship Coach", "Rehab Specialist"],
   },
 ];
 
@@ -250,7 +277,10 @@ function StepJobRole({ data, onChange }: { data: OnboardingData; onChange: (u: P
                 <p className={`text-sm font-black leading-tight ${hasSelected ? "text-primary" : "text-foreground"}`}>
                   {group.label}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {group.description}
+                </p>
+                <p className="text-[11px] font-semibold text-muted-foreground/80">
                   {count > 0 ? `${count} selected` : `${group.roles.length} roles`}
                 </p>
                 <ChevronRight className="absolute top-3 right-3 w-4 h-4 text-outline" />
@@ -278,7 +308,10 @@ function StepJobRole({ data, onChange }: { data: OnboardingData; onChange: (u: P
 
           <div className="flex items-center gap-2 pb-2 border-b border-outline-variant/20">
             <span className="text-2xl">{selectedGroup.emoji}</span>
-            <span className="text-base font-black text-foreground">{selectedGroup.label}</span>
+            <div>
+              <p className="text-base font-black text-foreground">{selectedGroup.label}</p>
+              <p className="text-xs text-muted-foreground">{selectedGroup.description}</p>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2.5">
