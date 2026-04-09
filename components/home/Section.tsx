@@ -19,7 +19,7 @@ export function Section({ children, className, id, as: Component = "section" }: 
     <Component
       id={id}
       className={cn(
-        "max-w-7xl mx-auto px-6 md:px-10 py-24 md:py-32",
+        "max-w-7xl mx-auto px-5 sm:px-6 md:px-10 py-16 sm:py-20 md:py-32",
         className
       )}
     >

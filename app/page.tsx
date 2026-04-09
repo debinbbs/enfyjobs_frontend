@@ -56,7 +56,7 @@ export default function Home() {
       </SectionFull>
 
       {/* Upskilling & Trust Promise - Clean White */}
-      <SectionFull className="bg-white space-y-32" innerClassName="space-y-32">
+      <SectionFull className="bg-white space-y-20 md:space-y-32" innerClassName="space-y-20 md:space-y-32">
         <Upskilling />
         <TrustPromise />
       </SectionFull>

@@ -38,9 +38,9 @@ export function TrustStrip() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 0.4 }}
-      className="py-8 border-t border-white/5 bg-black/20 backdrop-blur-2xl relative overflow-hidden"
+      className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/25 py-5 backdrop-blur-2xl sm:py-6 md:py-8"
     >
-      <div className="max-w-[1400px] mx-auto px-6 relative z-10 flex flex-wrap justify-between items-center gap-8 lg:gap-4">
+      <div className="relative z-10 grid grid-cols-2 gap-3 px-4 sm:grid-cols-3 sm:gap-4 sm:px-5 lg:grid-cols-5 lg:px-6">
         {stats.map((stat, i) => (
           <motion.div
             key={i}
@@ -48,14 +48,14 @@ export function TrustStrip() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1, duration: 0.5 }}
-            className="flex items-center gap-4 group/item min-w-[180px]"
+            className="flex min-w-0 items-center gap-3 rounded-2xl bg-white/5 px-3 py-3 group/item sm:px-4 sm:py-4"
           >
-            <div className="size-12 rounded-2xl bg-white/10 border border-white/10 shadow-2xl flex items-center justify-center group-hover/item:scale-110 transition-transform duration-500">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/10 shadow-2xl transition-transform duration-500 group-hover/item:scale-110 sm:size-12">
               {stat.icon}
             </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-black text-white leading-none">{stat.label}</span>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 mt-1.5">{stat.sub}</span>
+            <div className="flex min-w-0 flex-col">
+              <span className="text-lg leading-none font-black text-white sm:text-2xl">{stat.label}</span>
+              <span className="mt-1 text-[9px] font-black uppercase tracking-[0.16em] text-white/60 sm:text-[10px] sm:tracking-[0.2em]">{stat.sub}</span>
             </div>
           </motion.div>
         ))}

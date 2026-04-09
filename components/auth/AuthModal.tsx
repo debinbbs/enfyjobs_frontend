@@ -3,7 +3,7 @@
 import { cloneElement, type MouseEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoaderCircle, Sparkles, Verified } from "lucide-react";
@@ -24,7 +24,7 @@ interface AuthModalProps {
   children?: React.ReactElement;
 }
 
-type CandidateStep = "phone" | "otp" | "success";
+type CandidateStep = "phone" | "otp" | "onboarding" | "success";
 type CandidateAction = "send" | "verify" | null;
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001").replace(/\/$/, "");
@@ -125,6 +125,7 @@ export function AuthModal({ children }: AuthModalProps) {
   };
 
   const candidatePhoneNumber = normalizeCandidatePhone(selectedCountry, candidatePhone);
+  // Normalized phone used for wizard API calls
   const isSendingOtp = candidateAction === "send";
   const isVerifyingOtp = candidateAction === "verify";
   const defaultTrigger = (
@@ -133,7 +134,7 @@ export function AuthModal({ children }: AuthModalProps) {
     </Button>
   );
 
-  if (session) {
+  if (session && !open) {
     const sessionAwareTrigger = children || defaultTrigger;
 
     return cloneElement(sessionAwareTrigger, {
@@ -226,12 +227,20 @@ export function AuthModal({ children }: AuthModalProps) {
         throw new Error(getApiErrorMessage(payload, "Failed to verify OTP."));
       }
 
-      saveCandidateLogin(payload as CandidateTokenPayload, candidatePhoneNumber);
+      const parsedPayload = payload as CandidateTokenPayload;
+      saveCandidateLogin(parsedPayload, candidatePhoneNumber);
 
-      setCandidateStep("success");
-      setCandidateMessage("Taking you to your candidate dashboard...");
-      handleOpenChange(false);
-      router.push("/dashboard/candidate");
+      if (!parsedPayload.user?.candidate?.firstName) {
+        // NEW USER — store phone and redirect to the dedicated onboarding page
+        sessionStorage.setItem("enfyjobs:onboarding-phone", candidatePhoneNumber);
+        handleOpenChange(false);
+        router.push("/onboarding");
+      } else {
+        setCandidateStep("success");
+        setCandidateMessage("Taking you to your candidate dashboard...");
+        handleOpenChange(false);
+        router.push("/dashboard/candidate");
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to verify OTP.";
       setCandidateError(message);
@@ -278,22 +287,7 @@ export function AuthModal({ children }: AuthModalProps) {
           {/* Form Content Area */}
           <div className="flex-1 p-8 md:p-12 relative flex flex-col">
             <Tabs defaultValue="candidate" className="w-full">
-              <div className="flex justify-center md:justify-start mb-10">
-                <TabsList className="bg-surface-container-high/60 h-11 rounded-full p-1 border border-outline-variant/10 flex w-fit mx-auto">
-                  <TabsTrigger
-                    value="candidate"
-                    className="rounded-full !p-0 w-[150px] h-full font-black text-[10px] uppercase tracking-widest data-active:bg-white data-active:text-primary data-active:shadow-lg transition-all border-none flex items-center justify-center text-center gap-0 hover:cursor-pointer"
-                  >
-                    I&apos;m a Candidate
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="employer"
-                    className="rounded-full !p-0 w-[150px] h-full font-black text-[10px] uppercase tracking-widest data-active:bg-white data-active:text-primary data-active:shadow-lg transition-all text-on-surface-variant/60 hover:text-primary border-none flex items-center justify-center text-center gap-0 hover:cursor-pointer"
-                  >
-                    I&apos;m an Employer
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+              {/* Employer tab removed, emphasizing candidate flow */}
 
               <TabsContent value="candidate" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
                 <div className="space-y-2">
@@ -301,48 +295,50 @@ export function AuthModal({ children }: AuthModalProps) {
                   <p className="text-muted-foreground text-sm font-bold uppercase tracking-widest opacity-80">Mindful opportunities await you today.</p>
                 </div>
 
-                {/* Social Logins */}
-                <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" className="h-14 rounded-full border-outline-variant/20 hover:bg-surface-container-low transition-all group flex items-center justify-center gap-3">
-                    <LinkedInIcon className="size-5 text-[#0077b5]" />
-                    <span className="font-black text-sm uppercase tracking-wider">LinkedIn</span>
-                  </Button>
-                  <Button className="h-14 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white hover:opacity-90 transition-all flex items-center justify-center gap-3 border-none">
-                    <InstagramIcon className="size-5" />
-                    <span className="font-black text-sm uppercase tracking-wider">Instagram</span>
-                  </Button>
-                </div>
-
-                <div className="relative py-4 flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-outline-variant/10"></div>
+                  {/* Social Logins */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button variant="outline" className="h-14 rounded-full border-outline-variant/20 hover:bg-surface-container-low transition-all group flex items-center justify-center gap-3">
+                      <LinkedInIcon className="size-5 text-[#0077b5]" />
+                      <span className="font-black text-sm uppercase tracking-wider">LinkedIn</span>
+                    </Button>
+                    <Button className="h-14 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white hover:opacity-90 transition-all flex items-center justify-center gap-3 border-none">
+                      <InstagramIcon className="size-5" />
+                      <span className="font-black text-sm uppercase tracking-wider">Instagram</span>
+                    </Button>
                   </div>
-                  <span className="relative bg-surface-container-lowest px-4 text-[10px] font-black tracking-[0.3em] text-outline uppercase">or continue with</span>
-                </div>
+
+                  <div className="relative py-4 flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-outline-variant/10"></div>
+                    </div>
+                    <span className="relative bg-surface-container-lowest px-4 text-[10px] font-black tracking-[0.3em] text-outline uppercase">or continue with</span>
+                  </div>
 
                 <div className="space-y-6">
-                  <div className="space-y-2 px-1">
-                    <label className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant ml-4 block">Mobile Phone</label>
-                    <div className="flex h-16 bg-surface-container-highest rounded-full focus-within:ring-2 focus-within:ring-primary/20 focus-within:bg-surface-container-lowest transition-all group relative">
-                      <CountryCodeSelector
-                        selectedCountry={selectedCountry}
-                        onSelect={setSelectedCountry}
-                      />
-                      <Input
-                        placeholder="98765 43210"
-                        type="tel"
-                        inputMode="numeric"
-                        value={formatPhoneInput(candidatePhone)}
-                        onChange={(event) => {
-                          setCandidatePhone(event.target.value.replace(/\D/g, "").slice(0, 10));
-                        }}
-                        className="flex-1 h-full px-6 bg-transparent border-none rounded-r-full focus-visible:ring-0 focus-visible:bg-transparent transition-none placeholder:text-outline/40 font-black text-lg"
-                      />
+                  {candidateStep === "phone" && (
+                    <div className="space-y-2 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      <label className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant ml-4 block">Mobile Phone</label>
+                      <div className="flex h-16 bg-surface-container-highest rounded-full focus-within:ring-2 focus-within:ring-primary/20 focus-within:bg-surface-container-lowest transition-all group relative">
+                        <CountryCodeSelector
+                          selectedCountry={selectedCountry}
+                          onSelect={setSelectedCountry}
+                        />
+                        <Input
+                          placeholder="98765 43210"
+                          type="tel"
+                          inputMode="numeric"
+                          value={formatPhoneInput(candidatePhone)}
+                          onChange={(event) => {
+                            setCandidatePhone(event.target.value.replace(/\D/g, "").slice(0, 10));
+                          }}
+                          className="flex-1 h-full px-6 bg-transparent border-none rounded-r-full focus-visible:ring-0 focus-visible:bg-transparent transition-none placeholder:text-outline/40 font-black text-lg"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {candidateStep !== "phone" && (
-                    <div className="space-y-2 px-1">
+                  {candidateStep === "otp" && (
+                    <div className="space-y-2 px-1 animate-in fade-in slide-in-from-left-4 duration-500">
                       <label className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant ml-4 block">OTP Code</label>
                       <Input
                         placeholder="123456"
@@ -365,7 +361,7 @@ export function AuthModal({ children }: AuthModalProps) {
                     <p className="px-4 text-sm font-bold text-emerald-600">{candidateMessage}</p>
                   )}
 
-                  {candidateStep === "phone" ? (
+                  {candidateStep === "phone" && (
                     <Button
                       onClick={handleSendOtp}
                       disabled={isSendingOtp}
@@ -380,11 +376,13 @@ export function AuthModal({ children }: AuthModalProps) {
                         "Send OTP"
                       )}
                     </Button>
-                  ) : (
+                  )}
+
+                  {candidateStep === "otp" && (
                     <div className="space-y-3">
                       <Button
                         onClick={handleVerifyOtp}
-                        disabled={isVerifyingOtp || candidateStep === "success"}
+                        disabled={isVerifyingOtp}
                         className="w-full h-16 signature-gradient text-on-primary rounded-full font-black text-xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all border-none disabled:hover:scale-100"
                       >
                         {isVerifyingOtp ? (
@@ -392,8 +390,6 @@ export function AuthModal({ children }: AuthModalProps) {
                             <LoaderCircle className="size-5 animate-spin" />
                             Verifying
                           </span>
-                        ) : candidateStep === "success" ? (
-                          "Signed In"
                         ) : (
                           "Verify & Continue"
                         )}
@@ -409,6 +405,15 @@ export function AuthModal({ children }: AuthModalProps) {
                       </Button>
                     </div>
                   )}
+
+                  {candidateStep === "success" && (
+                    <Button
+                      disabled
+                      className="w-full h-16 signature-gradient text-on-primary rounded-full font-black text-xl shadow-xl shadow-primary/20 transition-all border-none"
+                    >
+                      Signed In
+                    </Button>
+                  )}
                 </div>
 
                 <p className="text-center text-[10px] text-outline font-black uppercase tracking-[0.1em] px-8 leading-relaxed opacity-60">
@@ -416,47 +421,7 @@ export function AuthModal({ children }: AuthModalProps) {
                 </p>
               </TabsContent>
 
-              <TabsContent value="employer" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
-                <div className="space-y-2">
-                  <h1 className="text-4xl font-black text-foreground tracking-tight font-display">Hire Wellness Pros</h1>
-                  <p className="text-muted-foreground text-sm font-bold uppercase tracking-widest opacity-80">Build a team that breathes vitality.</p>
-                </div>
-
-                <div className="space-y-5">
-                  <div className="space-y-2 px-1">
-                    <label className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant ml-4 block">Business Email</label>
-                    <Input
-                      placeholder="name@company.com"
-                      type="email"
-                      className="h-16 px-8 bg-surface-container-highest border-none rounded-full focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:bg-surface-container-lowest transition-all placeholder:text-outline/40 font-black text-lg"
-                    />
-                  </div>
-                  <div className="space-y-2 px-1">
-                    <label className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant ml-4 block">Password</label>
-                    <Input
-                      placeholder="••••••••"
-                      type="password"
-                      className="h-16 px-8 bg-surface-container-highest border-none rounded-full focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:bg-surface-container-lowest transition-all placeholder:text-outline/40 font-black text-lg"
-                    />
-                  </div>
-
-                  <Button className="w-full h-16 bg-foreground text-background rounded-full font-black text-xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all border-none">
-                    Employer Login 💼
-                  </Button>
-                </div>
-
-                <div className="relative py-4 flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-outline-variant/10"></div>
-                  </div>
-                  <span className="relative bg-surface-container-lowest px-4 text-[10px] font-black tracking-[0.3em] text-outline uppercase">Professional Verification</span>
-                </div>
-
-                <Button variant="outline" className="w-full h-16 rounded-full border-2 border-primary/20 text-primary font-black text-lg hover:bg-primary/5 transition-all flex items-center justify-center gap-3">
-                  <LinkedInIcon className="size-6 text-[#0077b5]" />
-                  <span>Login with LinkedIn</span>
-                </Button>
-              </TabsContent>
+              {/* Employer tab content removed */}
             </Tabs>
           </div>
         </div>

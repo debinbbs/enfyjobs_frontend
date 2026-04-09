@@ -17,8 +17,8 @@ interface SectionFullProps {
  */
 export function SectionFull({ children, className, innerClassName, id, as: Component = "section" }: SectionFullProps) {
   return (
-    <Component id={id} className={cn("w-full py-24 md:py-32", className)}>
-      <div className={cn("max-w-7xl mx-auto px-6 md:px-10", innerClassName)}>
+    <Component id={id} className={cn("w-full py-16 sm:py-20 md:py-32", className)}>
+      <div className={cn("max-w-7xl mx-auto px-5 sm:px-6 md:px-10", innerClassName)}>
         {children}
       </div>
     </Component>

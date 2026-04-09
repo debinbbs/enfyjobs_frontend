@@ -34,7 +34,7 @@ export function TrustPromise() {
 
   return (
     <div className="w-full" id="trust">
-      <div className="flex flex-col lg:flex-row gap-20 items-center">
+      <div className="flex flex-col items-start gap-12 sm:gap-14 lg:flex-row lg:items-center lg:gap-20">
         <motion.div 
           initial={{ opacity: 0, x: -15 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -47,10 +47,10 @@ export function TrustPromise() {
           </Badge>
 
           <div className="space-y-5">
-            <h2 className="max-w-3xl text-[42px] font-black leading-[1.02] text-foreground md:text-[55px]">
+            <h2 className="max-w-3xl text-[2rem] sm:text-[2.5rem] font-black leading-[1.02] text-foreground md:text-[55px]">
               Solving the Wellness Skill Gap in India.
             </h2>
-            <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
               Built for the next generation of wellness professionals to dominate their career — without the noise.
             </p>
           </div>
@@ -64,7 +64,7 @@ export function TrustPromise() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="p-8 rounded-[2.5rem] bg-card border border-border/10 shadow-xl group hover:-translate-y-2 transition-all duration-500"
+              className="group rounded-[2rem] border border-border/10 bg-card p-6 shadow-xl transition-all duration-500 hover:-translate-y-2 sm:rounded-[2.5rem] sm:p-8"
             >
               <div className={`size-16 rounded-2xl ${point.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
                 {point.icon}

@@ -66,7 +66,7 @@ export function InfiniteMarquee() {
 
   return (
     <div className="w-full overflow-hidden bg-white py-12 select-none border-y border-gray-50">
-      <div className="flex flex-col gap-12 md:gap-16">
+      <div className="flex flex-col gap-8 sm:gap-10 md:gap-16">
         {/* Row 1 - Right to Left */}
         <div className="relative flex overflow-x-hidden">
           <motion.div
@@ -78,10 +78,10 @@ export function InfiniteMarquee() {
               repeat: Infinity,
               ease: "linear",
             }}
-            className="flex gap-16 items-center whitespace-nowrap px-8"
+            className="flex items-center gap-10 whitespace-nowrap px-5 sm:gap-12 sm:px-6 md:gap-16 md:px-8"
           >
             {duplicatedItems.map((item, i) => (
-              <div key={`row1-${item.id}-${i}`} className="flex items-center gap-6">
+              <div key={`row1-${item.id}-${i}`} className="flex items-center gap-4 sm:gap-5 md:gap-6">
                 <div 
                   className="w-28 h-16 md:w-44 md:h-24 rounded-md overflow-hidden shrink-0 shadow-lg border border-gray-100" 
                 >
@@ -92,7 +92,7 @@ export function InfiniteMarquee() {
                   />
                 </div>
                 <span 
-                  className="text-4xl md:text-7xl font-medium tracking-tighter"
+                  className="text-2xl sm:text-4xl md:text-7xl font-medium tracking-tighter"
                   style={{ color: item.color, fontFamily: "serif" }}
                 >
                   {item.text.toLowerCase()}
@@ -113,10 +113,10 @@ export function InfiniteMarquee() {
               repeat: Infinity,
               ease: "linear",
             }}
-            className="flex gap-16 items-center whitespace-nowrap px-8"
+            className="flex items-center gap-10 whitespace-nowrap px-5 sm:gap-12 sm:px-6 md:gap-16 md:px-8"
           >
             {duplicatedItems.map((item, i) => (
-              <div key={`row2-${item.id}-${i}`} className="flex items-center gap-6">
+              <div key={`row2-${item.id}-${i}`} className="flex items-center gap-4 sm:gap-5 md:gap-6">
                 <div 
                   className="w-28 h-16 md:w-44 md:h-24 rounded-md overflow-hidden shrink-0 shadow-lg border border-gray-100" 
                 >
@@ -127,7 +127,7 @@ export function InfiniteMarquee() {
                   />
                 </div>
                 <span 
-                  className="text-4xl md:text-7xl font-medium tracking-tighter"
+                  className="text-2xl sm:text-4xl md:text-7xl font-medium tracking-tighter"
                   style={{ color: item.color, fontFamily: "serif" }}
                 >
                   {item.text.toLowerCase()}

@@ -24,7 +24,7 @@ export function Testimonials() {
 
   return (
     <div id="testimonials" className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 items-center">
+      <div className="grid grid-cols-1 items-center gap-12 sm:gap-14 lg:grid-cols-3 lg:gap-20">
         <motion.div 
           initial={{ opacity: 0, x: -15 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -32,17 +32,17 @@ export function Testimonials() {
           transition={{ duration: 0.6 }}
           className="lg:col-span-1 space-y-10 text-foreground"
         >
-          <h2 className="text-5xl font-black font-display leading-[1.05]">Built for the next wave of wellness talent</h2>
-          <p className="text-xl text-muted-foreground leading-relaxed">
+          <h2 className="text-[2.25rem] sm:text-[2.75rem] md:text-5xl font-black font-display leading-[1.05]">Built for the next wave of wellness talent</h2>
+          <p className="text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
             From first jobs to stronger career moves, Wellnessjobsindia is designed to help wellness candidates feel more seen, more prepared, and more in control.
           </p>
-          <div className="flex gap-12">
+          <div className="flex flex-wrap gap-8 sm:gap-12">
             <div>
-              <span className="text-5xl font-black text-primary">50k+</span>
+              <span className="text-4xl font-black text-primary sm:text-5xl">50k+</span>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-3">Candidates Exploring</p>
             </div>
             <div>
-              <span className="text-5xl font-black text-secondary">1.2k+</span>
+              <span className="text-4xl font-black text-secondary sm:text-5xl">1.2k+</span>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-3">Career Moves Started</p>
             </div>
           </div>
@@ -57,13 +57,13 @@ export function Testimonials() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.2, duration: 0.6 }}
             >
-              <Card className="p-10 rounded-[2.5rem] bg-card shadow-xl border-border/10 space-y-8 flex flex-col justify-between hover:shadow-2xl transition-all group h-full">
+              <Card className="flex h-full flex-col justify-between space-y-8 rounded-[2rem] border-border/10 bg-card p-6 shadow-xl transition-all group hover:shadow-2xl sm:rounded-[2.5rem] sm:p-8 md:p-10">
                 <CardContent className="p-0 space-y-8">
                   <div className="space-y-6">
                     <div className="flex gap-1 text-tertiary">
                       {[1,2,3,4,5].map(s => <Star key={s} className="size-5 fill-current" />)}
                     </div>
-                    <p className="text-xl font-bold leading-relaxed italic text-foreground">&quot;{t.quote}&quot;</p>
+                    <p className="text-lg font-bold italic leading-relaxed text-foreground sm:text-xl">&quot;{t.quote}&quot;</p>
                   </div>
                   <Separator className="bg-border/50" />
                   <div className="flex items-center gap-4">
