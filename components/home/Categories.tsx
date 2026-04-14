@@ -3,44 +3,44 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 export function Categories() {
   const categories = [
     {
       image: "/images/all/steptodown.com575388.jpg",
-      label: "Yoga Instructor",
-      detail: "Fitness coaches, yoga instructors, studio trainers",
+      label: "Salon & Spa Services",
+      detail: "Create confidence through care.",
       color: "from-blue-500/20",
     },
     {
       image: "/images/all/steptodown.com239490.jpg",
-      label: "Therapist",
-      detail: "Counselors, therapists, support professionals",
+      label: "Wellness Hospitality",
+      detail: "Deliver comfort & experiences.",
       color: "from-purple-500/20",
     },
     {
       image: "/images/all/steptodown.com222353.jpg",
-      label: "Nutritionist",
-      detail: "Nutritionists, wellness coaches, lifestyle consultants",
+      label: "Beauty & Skin",
+      detail: "Enhance beauty with expertise.",
       color: "from-emerald-500/20",
     },
     {
       image: "/images/all/steptodown.com750516.jpg",
-      label: "Spa & Salon",
-      detail: "Spa therapists, massage experts, wellness attendants",
+      label: "Yoga & Fitness",
+      detail: "Train bodies. Build discipline.",
       color: "from-teal-500/20",
     },
     {
       image: "/images/all/steptodown.com195727.jpg",
-      label: "Beauty & Skin",
-      detail: "Makeup artists, beauticians, skin therapists, beauty advisors",
+      label: "Therapy & Rehabilitation",
+      detail: "Restore movement. Improve lives.",
       color: "from-pink-500/20",
     },
     {
       image: "/images/all/steptodown.com968256.jpg",
-      label: "Mental Wellness",
-      detail: "Counselors, therapists, support professionals",
+      label: "Mental Health & Coaching",
+      detail: "Support minds. Change lives.",
       color: "from-purple-500/20",
     },
   ];
@@ -56,7 +56,7 @@ export function Categories() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
     visible: {
       opacity: 1,
@@ -64,7 +64,7 @@ export function Categories() {
       scale: 1,
       transition: { duration: 0.5, ease: "easeOut" }
     },
-  } as any;
+  };
 
   return (
     <div id="categories" className="w-full">
@@ -81,7 +81,7 @@ export function Categories() {
             Explore wellness career paths.
           </h2>
           <p className="max-w-lg text-base font-medium text-muted-foreground sm:text-lg md:text-xl">
-            Yoga, therapy, nutrition &amp; more &mdash; or get matched based on <span className="text-primary font-bold">your</span> profile.
+            Salon, spa, beauty, fitness, therapy, and coaching roles &mdash; or get matched based on <span className="text-primary font-bold">your</span> profile.
           </p>
         </div>
         <Link href="/jobs" className="group inline-flex items-center gap-3 text-base sm:text-lg font-bold text-primary hover:text-foreground transition-all duration-300">
