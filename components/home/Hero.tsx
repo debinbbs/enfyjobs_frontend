@@ -17,6 +17,7 @@ export function Hero() {
           src="/images/all/spa-wellness.jpg"
           alt="Serene Wellness Atmosphere"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />

@@ -1,13 +1,32 @@
 "use client";
 
-import { BadgeCheck, FileText, Search, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export function HiringJourney() {
   const steps = [
-    { icon: <FileText className="size-9" />, title: "Create Your Profile", subtitle: "Upload your resume skills. Just 60 Seconds.", color: "text-primary border-primary/20" },
-    { icon: <Search className="size-9" />, title: "Get Discovered by Employers", subtitle: "Verified wellness companies view your profile.", color: "text-secondary border-secondary/20" },
-    { icon: <BadgeCheck className="size-9" />, title: "Get Hired", subtitle: "Connect with employers ready to hire.", color: "text-on-secondary bg-secondary scale-125 shadow-2xl border-none" }
+    { 
+      image: "/images/home/step-1.png", 
+      step: "Step 1", 
+      title: "Create Your Profile", 
+      subtitle: "UPLOAD YOUR RESUME SKILLS. JUST 60 SECONDS.", 
+      glow: "group-hover:shadow-blue-500/20"
+    },
+    { 
+      image: "/images/home/step-2.jpg", 
+      step: "Step 2", 
+      title: "Get Discovered by Employers", 
+      subtitle: "VERIFIED WELLNESS COMPANIES VIEW YOUR PROFILE.", 
+      glow: "group-hover:shadow-cyan-500/20"
+    },
+    { 
+      image: "/images/home/step-3.png", 
+      step: "Step 3", 
+      title: "Get Hired", 
+      subtitle: "CONNECT WITH EMPLOYERS READY TO HIRE.", 
+      glow: "group-hover:shadow-emerald-500/20"
+    }
   ];
 
   return (
@@ -24,32 +43,46 @@ export function HiringJourney() {
         </p>
       </motion.div>
 
-      <div className="relative mx-auto max-w-6xl px-0 sm:px-2 md:px-6">
-        {/* Connection Segments with Arrows */}
-        <div className="hidden lg:grid grid-cols-2 absolute top-12 left-[10%] w-[80%] z-0 h-0.5 items-center">
-          {[0, 1].map((i) => (
-            <div key={i} className="relative flex items-center justify-center">
-              <div className="w-full h-[2px] bg-gradient-to-r from-muted-foreground/10 to-muted-foreground/20" />
-              <ChevronRight className="absolute text-secondary size-5 opacity-40" />
-            </div>
-          ))}
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 mt-12 md:mt-20">
+        {/* Connection Lines (Desktop) */}
+        <div className="hidden lg:flex absolute top-[100px] left-[15%] w-[70%] z-0 h-px items-center pointer-events-none">
+          <div className="w-full h-[1px] bg-slate-200" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-16 gap-x-8 relative z-10">
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 relative z-10">
           {steps.map((step, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, scale: 0.5 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15, duration: 0.5, type: "spring", stiffness: 100 }}
-              className="flex flex-col items-center gap-6 group"
+              initial={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+              className="flex flex-col items-center h-full"
             >
-              <div className={`flex size-20 sm:size-24 rounded-full bg-card shadow-xl items-center justify-center border-4 transition-all duration-500 group-hover:scale-110 ${step.color}`}>
-                {step.icon}
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-lg font-display text-foreground">{step.title}</h4>
-                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.18em] sm:tracking-widest">{step.subtitle}</p>
+              {/* Vertical Card Container */}
+              <div className="w-full max-w-[280px] h-[520px] bg-gradient-to-b from-blue-50/80 via-white to-white rounded-[2rem] p-8 flex flex-col items-center border border-blue-100 shadow-sm group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+                {/* Square Image Container */}
+                <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-12 shadow-md group-hover:-translate-y-1 transition-transform duration-500">
+                  <Image 
+                    src={step.image} 
+                    alt={step.title}
+                    fill
+                    className="object-cover"
+                    priority={i === 0}
+                  />
+                </div>
+
+                {/* Text Content */}
+                <div className="text-center space-y-4">
+                  <span className="text-primary font-black uppercase tracking-widest text-[10px]">
+                    {step.step}
+                  </span>
+                  <h4 className="font-display font-black text-xl text-foreground leading-tight px-2">
+                    {step.title}
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-[0.15em] leading-relaxed max-w-[200px] mx-auto">
+                    {step.subtitle}
+                  </p>
+                </div>
               </div>
             </motion.div>
           ))}
