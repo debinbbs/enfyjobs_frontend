@@ -53,7 +53,7 @@ export function Swapper<T>({
         modules={[EffectCards, Navigation, Pagination, Autoplay]}
         className="mySwiper w-full h-full"
         autoplay={autoplay}
-        loop={loop}
+        loop={loop && items.length > (effect === 'cards' ? 4 : 1)}
         onSwiper={onSwiper}
         onSlideChange={onSlideChange}
         centeredSlides={true}

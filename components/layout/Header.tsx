@@ -33,6 +33,7 @@ export function Header() {
   const navigationItems = [
     { name: "Home", href: "/" },
     { name: "Jobs", href: "/jobs" },
+    { name: "Resources", href: "/resources" },
     { name: "About Us", href: "/about" },
   ];
 

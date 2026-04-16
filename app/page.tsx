@@ -8,6 +8,8 @@ import { Upskilling } from "@/components/home/Upskilling";
 import { HiringJourney } from "@/components/home/HiringJourney";
 import { TrustPromise } from "@/components/home/TrustPromise";
 import { Testimonials } from "@/components/home/Testimonials";
+import { Resources } from "@/components/home/Resources";
+
 
 import { motion } from "framer-motion";
 import { Section } from "@/components/home/Section";
@@ -41,6 +43,7 @@ export default function Home() {
             src="/images/all/spa-wellness.jpg"
             alt="Spa Background"
             fill
+            sizes="100vw"
             className="object-cover opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
@@ -61,7 +64,11 @@ export default function Home() {
         <TrustPromise />
       </SectionFull>
 
+      {/* Resources - Insights Section */}
+      <Resources />
+
       {/* Testimonials - Soft Background */}
+
       <SectionFull className="bg-slate-50">
         <Testimonials />
       </SectionFull>

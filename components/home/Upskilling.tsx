@@ -57,6 +57,7 @@ export function Upskilling() {
               src="/images/home/upskilling/wellness-student.jpg"
               alt="Wellness Student"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           </motion.div>
@@ -69,6 +70,7 @@ export function Upskilling() {
               src="/images/home/upskilling/professionals.jpg"
               alt="Professionals"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           </motion.div>

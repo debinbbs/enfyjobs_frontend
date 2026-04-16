@@ -187,11 +187,10 @@ export function AuthModal({ children }: AuthModalProps) {
       // Development mock: auto-fill OTP
       if (process.env.NODE_ENV !== "production") {
         setCandidateOtp("123456");
-        setCandidateMessage(`[DEV] OTP bypassed. Click Verify to continue.`);
       } else {
         setCandidateOtp("");
-        setCandidateMessage(`OTP sent to ${candidatePhoneNumber}.`);
       }
+      setCandidateMessage(`OTP sent to ${candidatePhoneNumber}.`);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to send OTP.";
       setCandidateError(message);
@@ -342,8 +341,8 @@ export function AuthModal({ children }: AuthModalProps) {
                     <div className="space-y-2 px-1 animate-in fade-in slide-in-from-left-4 duration-500">
                       <label className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant ml-4 block">OTP Code</label>
                       <Input
-                        placeholder="123456"
-                        type="text"
+                        placeholder="••••••"
+                        type="password"
                         inputMode="numeric"
                         value={candidateOtp}
                         onChange={(event) => {

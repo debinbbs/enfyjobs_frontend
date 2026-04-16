@@ -37,6 +37,7 @@ export function TechFeatures() {
                   src="/images/about/phone-transparent.png"
                   alt="WellnessJobsIndia App"
                   fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
                   className="object-contain drop-shadow-[0_30px_60px_rgba(139,92,246,0.35)]"
                   priority
                 />

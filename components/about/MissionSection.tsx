@@ -97,6 +97,7 @@ export function MissionSection() {
                 src="/images/about/mission-floating-t.png"
                 alt="Zen Yoga Instructor"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-contain"
                 priority
               />

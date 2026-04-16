@@ -139,6 +139,34 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
   );
 }
 
+// ─── Validation Helpers ──────────────────────────────────────────────────────
+
+function isLikelyProperName(name: string, isFirstName: boolean = false): boolean {
+  const n = name.trim();
+  if (n.length < 2) return false;
+  if (/[0-9]/.test(n)) return false;
+  
+  // Rule 1: First names must be at least 3 characters to be considered "proper"
+  // This blocks short entries like "Sa" or "Mo" from being used as a first name.
+  if (isFirstName && n.length < 3) return false;
+
+  // Rule 2: Block 3+ consecutive identical characters (e.g. "aaaaa", "tttttt")
+  if (/(.)\1{2,}/i.test(n)) return false;
+
+  // Rule 3: 2-character names (usually Last Names) must be sensible.
+  // We allow "Ao", "Ng", "Pi" but block "tt", "xx", etc.
+  if (n.length === 2) {
+    const isVowelBased = /[aeiouy]/.test(n.toLowerCase());
+    const isNg = n.toLowerCase() === "ng";
+    const sameChar = n[0].toLowerCase() === n[1].toLowerCase();
+    
+    if (sameChar) return false;
+    if (!isVowelBased && !isNg) return false;
+  }
+
+  return true;
+}
+
 // ─── Desktop left panel ───────────────────────────────────────────────────────
 
 function LeftPanel() {
@@ -201,7 +229,7 @@ function StepName({ data, onChange }: { data: OnboardingData; onChange: (u: Part
           <input
             type="text"
             value={data.firstName}
-            onChange={(e) => onChange({ firstName: e.target.value })}
+            onChange={(e) => onChange({ firstName: e.target.value.replace(/[0-9]/g, "") })}
             placeholder="e.g. Priya"
             className={INPUT}
             autoFocus
@@ -209,12 +237,12 @@ function StepName({ data, onChange }: { data: OnboardingData; onChange: (u: Part
         </div>
         <div>
           <label className="block text-xs font-black uppercase tracking-widest text-on-surface-variant mb-2 ml-1">
-            Last Name
+            Last Name *
           </label>
           <input
             type="text"
             value={data.lastName}
-            onChange={(e) => onChange({ lastName: e.target.value })}
+            onChange={(e) => onChange({ lastName: e.target.value.replace(/[0-9]/g, "") })}
             placeholder="e.g. Sharma"
             className={INPUT}
           />
@@ -631,7 +659,9 @@ export function CandidateOnboardingWizard({
 
   // ── Can proceed? (per-step validation) ─────────────────────────────────────
   const canNext = () => {
-    if (currentStep === "name") return data.firstName.trim().length >= 2;
+    if (currentStep === "name") {
+      return isLikelyProperName(data.firstName, true) && isLikelyProperName(data.lastName, false);
+    }
     if (currentStep === "job-role") return data.jobCategories.length > 0;
     if (currentStep === "experience") return data.hasExperience !== null;
     if (currentStep === "location") {
@@ -767,7 +797,7 @@ export function CandidateOnboardingWizard({
 
   // ── Desktop layout ──────────────────────────────────────────────────────────
   const desktopCard = (
-    <div className="hidden md:flex w-full max-w-3xl bg-card rounded-3xl shadow-2xl shadow-primary/10 overflow-hidden min-h-[560px] max-h-[90vh] border border-outline-variant/20">
+    <div className="hidden md:flex w-full max-w-4xl bg-card rounded-[2.5rem] shadow-2xl shadow-primary/10 overflow-hidden h-[620px] border border-outline-variant/20">
       <LeftPanel />
 
       <div className="flex-1 flex flex-col overflow-hidden bg-card">
@@ -792,10 +822,12 @@ export function CandidateOnboardingWizard({
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+        <div className="flex-1 overflow-y-auto px-10 py-8 space-y-8 scrollbar-thin scrollbar-thumb-outline-variant/20 scrollbar-track-transparent">
           {formContent}
+        </div>
 
-          {!isSuccess && (
+        {!isSuccess && (
+          <div className="flex-shrink-0 px-10 py-6 bg-surface-container-lowest border-t border-outline-variant/10">
             <button
               onClick={isFinalInputStep ? handleSubmit : goNext}
               disabled={!canNext() || isSubmitting}
@@ -808,11 +840,13 @@ export function CandidateOnboardingWizard({
                   "Complete Profile"
                 )
               ) : (
-                "Next ->"
+                <span className="inline-flex items-center gap-2">
+                  Next Step <ChevronRight className="w-5 h-5" />
+                </span>
               )}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
